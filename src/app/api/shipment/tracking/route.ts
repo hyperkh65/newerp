@@ -1,4 +1,4 @@
-// import { XMLParser } from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 import { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -16,18 +16,12 @@ export async function GET(request: NextRequest) {
     const searchYears = [currentYear, currentYear - 1, currentYear - 2];
     const crkyCn = 'r260g286i041p271c040p050q0';
 
-    // TODO: fast-xml-parser 설치 후 복구 필요
-    const parser = {
-        parse: (xml: string) => ({})
-    };
-    /*
     const parser = new XMLParser({
         ignoreAttributes: false,
         trimValues: true,
         parseTagValue: true,
         removeNSPrefix: true,
     });
-    */
 
     try {
         // 1. Try IMPORT Tracking (API001)
@@ -37,7 +31,7 @@ export async function GET(request: NextRequest) {
                 let url = `https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=${crkyCn}&${type}=${blNo}&blYy=${year}`;
                 let response = await fetch(url, { method: 'GET', cache: 'no-store' });
                 let xmlData = await response.text();
-                let jObj = parser.parse(xmlData);
+                let jObj: any = parser.parse(xmlData);
 
                 const root = jObj?.cargCsclPrgsInfoQryRtnVo;
                 const result = root?.cargCsclPrgsInfoQryVo;
