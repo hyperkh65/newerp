@@ -557,6 +557,7 @@ export default function ImportsPage() {
                                     currency: 'USD',
                                     incoterms: 'FOB',
                                     dutyExchangeRate: 1400,
+                                    freightExchangeRate: 1400,
                                     paymentExchangeRate: 1450,
                                     freight: 0,
                                     localCharges: 0,
