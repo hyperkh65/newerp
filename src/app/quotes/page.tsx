@@ -35,6 +35,7 @@ interface QuoteRecord {
     specialNotes?: string;
     attach1?: string;
     attach2?: string;
+    attach3?: string;
     attacht1?: string;
     attacht2?: string;
     attacht3?: string;
