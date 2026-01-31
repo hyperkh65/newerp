@@ -1,0 +1,37 @@
+{
+    "name": "ynk-erp",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.24.1",
+        "@supabase/supabase-js": "latest",
+        "cloudinary": "^2.0.0",
+        "clsx": "latest",
+        "fast-xml-parser": "^4.3.4",
+        "framer-motion": "latest",
+        "lucide-react": "latest",
+        "mammoth": "^1.11.0",
+        "next": "14.1.0",
+        "openai": "^6.17.0",
+        "pdf-parse": "^2.4.5",
+        "react": "latest",
+        "react-dom": "latest",
+        "tailwind-merge": "latest",
+        "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "@types/node": "latest",
+        "@types/pdf-parse": "^1.1.5",
+        "@types/react": "latest",
+        "@types/react-dom": "latest",
+        "eslint": "latest",
+        "eslint-config-next": "14.1.0",
+        "typescript": "latest"
+    }
+}

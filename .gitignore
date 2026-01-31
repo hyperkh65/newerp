@@ -1,0 +1,20 @@
+node_modules/
+.next/
+.env.local
+*.log
+.DS_Store
+
+# Test files with secrets
+check-*.js
+test-*.js
+test_*.js
+dump-schema.js
+list-keys.js
+debug_props.js
+
+check-*.js
+test-*.js
+test_*.js
+dump-schema.js
+list-keys.js
+debug_props.js
