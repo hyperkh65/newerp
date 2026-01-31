@@ -342,7 +342,7 @@ export default function Dashboard() {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                                                 <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>{item.title}</p>
                                                 {item.hasFile && (
-                                                    <FileText size={14} color="#00dfd8" title="파일 첨부됨" />
+                                                    <FileText size={14} color="#00dfd8" />
                                                 )}
                                             </div>
                                             <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>
