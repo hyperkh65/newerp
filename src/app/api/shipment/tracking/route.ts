@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         const exportUrl = `https://unipass.customs.go.kr:38010/ext/rest/expDclrNoPrExpFfmnBrkdQry/retrieveExpDclrNoPrExpFfmnBrkd?crkyCn=${crkyCn}&blNo=${blNo}`;
         const expRes = await fetch(exportUrl, { method: 'GET', cache: 'no-store' });
         const expXml = await expRes.text();
-        const expObj = parser.parse(expXml);
+        const expObj: any = parser.parse(expXml);
 
         const expRoot = expObj?.expDclrNoPrExpFfmnBrkdQryRtnVo;
         const expResult = expRoot?.expDclrNoPrExpFfmnBrkdBlNoQryRsltVo;
