@@ -267,6 +267,7 @@ export default function QuotesPage() {
             attacht1: q.attacht1 || '',
             attacht2: q.attacht2 || '',
             attacht3: q.attacht3 || '',
+            docType: q.docType || 'QUOTE',
             items: q.items.map(it => ({ ...it }))
         });
         setEditMode(true);
