@@ -84,7 +84,7 @@ export default function SCMPage() {
                         hasHistory: !!inMap[p.name]
                     };
                 })
-                .filter(p => p.hasHistory); // 입고 등록 시킨 것만 표시
+                .filter((p: any) => p.hasHistory); // 입고 등록 시킨 것만 표시
 
             setInventory(data);
         } catch (e) {
