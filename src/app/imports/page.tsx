@@ -247,6 +247,7 @@ export default function ImportsPage() {
                     exporter: p.Exporter?.rich_text?.[0]?.plain_text || '-',
                     importer: p.Importer?.rich_text?.[0]?.plain_text || '-',
                     blNoMaster: p.BLNoMaster?.rich_text?.[0]?.plain_text || '-',
+                    blNoHouse: p.BLNoHouse?.rich_text?.[0]?.plain_text || '-',
                     totalCost: p.TotalCost?.number || 0,
                     currency: p.Currency?.select?.name || 'USD',
                 } as ImportMaster;
@@ -908,6 +909,7 @@ export default function ImportsPage() {
                             <thead>
                                 <tr style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '0.75rem', textTransform: 'uppercase', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                                     <th style={{ padding: '1rem' }}>수입 번호</th>
+                                    <th style={{ padding: '1rem', width: '100px', textAlign: 'center' }}>상태</th>
                                     <th style={{ padding: '1rem' }}>날짜</th>
                                     <th style={{ padding: '1rem' }}>수출업체</th>
                                     <th style={{ padding: '1rem' }}>Master B/L</th>
@@ -917,10 +919,17 @@ export default function ImportsPage() {
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan={6} style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>로드 중...</td></tr>
+                                    <tr><td colSpan={7} style={{ padding: '5rem', textAlign: 'center', opacity: 0.5 }}>로드 중...</td></tr>
                                 ) : imports.map(imp => (
                                     <tr key={imp.id} onClick={() => openImportDetail(imp)} style={{ cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                         <td style={{ padding: '1.2rem 1rem', fontWeight: 800 }}>{imp.importNo}</td>
+                                        <td style={{ padding: '1.2rem 1rem', textAlign: 'center' }}>
+                                            {(imp.blNoMaster && imp.blNoMaster !== '-') || (imp.blNoHouse && imp.blNoHouse !== '-') ? (
+                                                <span style={{ fontSize: '0.75rem', padding: '5px 10px', borderRadius: '20px', background: 'rgba(0, 255, 136, 0.1)', color: '#00ff88', fontWeight: 700, border: '1px solid rgba(0, 255, 136, 0.2)', whiteSpace: 'nowrap' }}>진행 중</span>
+                                            ) : (
+                                                <span style={{ fontSize: '0.75rem', padding: '5px 10px', borderRadius: '20px', background: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, border: '1px solid rgba(255, 255, 255, 0.1)', whiteSpace: 'nowrap' }}>종 료</span>
+                                            )}
+                                        </td>
                                         <td style={{ padding: '1.2rem 1rem', color: 'rgba(255,255,255,0.6)' }}>{imp.date}</td>
                                         <td style={{ padding: '1.2rem 1rem' }}>{imp.exporter}</td>
                                         <td style={{ padding: '1.2rem 1rem' }}>{imp.blNoMaster}</td>

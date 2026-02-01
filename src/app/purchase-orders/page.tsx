@@ -370,8 +370,8 @@ export default function PurchaseOrdersPage() {
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
                                 <p style={{ margin: '2px 0' }}>Biz No: {company.bizNo}</p>
+                                <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
                             </div>
-                            {company.stampUrl && <img src={company.stampUrl} alt="Stamp" style={{ position: 'absolute', right: '0', bottom: '-35px', width: '85px', opacity: 0.8, zIndex: 1 }} />}
                         </div>
                     </div>
 
@@ -436,18 +436,46 @@ export default function PurchaseOrdersPage() {
 
                     {/* Bottom Conditions Section */}
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
-                        <div>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 10px 0', borderBottom: '1.5px solid #2c3e50', display: 'inline-block' }}>TERMS & CONDITIONS</h4>
-                            <div style={{ fontSize: '0.85rem', color: '#2f3640', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
-                                {printData.specialNotes || '1. Delivery Date: As per mutual agreement\n2. Quality: Must pass incoming QC inspection\n3. Payment: Net 30 days after invoice received\n4. Documents: Delivery note and Invoice required upon delivery'}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 10px 0', borderBottom: '1.5px solid #2c3e50', display: 'inline-block' }}>TERMS & CONDITIONS</h4>
+                                <div style={{ fontSize: '0.85rem', color: '#2f3640', lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>
+                                    {printData.specialNotes || '1. Delivery Date: As per mutual agreement\n2. Quality: Must pass incoming QC inspection\n3. Payment: Net 30 days after invoice received\n4. Documents: Delivery note and Invoice required upon delivery'}
+                                </div>
+                            </div>
+                            <div style={{ padding: '15px', background: '#f5f6fa', borderRadius: '4px', border: '1px solid #dcdde1' }}>
+                                <h4 style={{ fontSize: '0.8rem', fontWeight: 700, margin: '0 0 5px 0', color: '#7f8c8d' }}>BUYER'S BANK INFORMATION</h4>
+                                {printData.currency === 'KRW' ? (
+                                    <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>{company.bank}</p>
+                                ) : (
+                                    <div style={{ fontSize: '0.85rem' }}>
+                                        <p style={{ margin: '0 0 2px 0', fontWeight: 600 }}>{company.bankForeign1}</p>
+                                        <p style={{ margin: 0 }}>{company.bankForeign2}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <div style={{ border: '1px solid #dcdde1', borderRadius: '4px', padding: '15px', position: 'relative' }}>
+                        <div style={{ border: '1px solid #dcdde1', borderRadius: '4px', padding: '15px', position: 'relative', minHeight: '180px' }}>
                             <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7f8c8d', marginBottom: '40px' }}>AUTHORIZED SIGNATURE</p>
-                            <div style={{ textAlign: 'center' }}>
+                            <div style={{ textAlign: 'center', position: 'absolute', bottom: '20px', left: '0', userSelect: 'none', width: '100%' }}>
                                 <div style={{ height: '1px', background: '#2c3e50', width: '80%', margin: '0 auto 10px auto' }}></div>
                                 <p style={{ fontSize: '0.8rem', fontWeight: 800 }}>{company.name}</p>
                             </div>
+                            {company.stampUrl && (
+                                <img
+                                    src={company.stampUrl}
+                                    alt="Stamp"
+                                    style={{
+                                        position: 'absolute',
+                                        left: '50%',
+                                        bottom: '30px',
+                                        transform: 'translateX(-50%)',
+                                        width: '240px',
+                                        opacity: 0.9,
+                                        zIndex: 1
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

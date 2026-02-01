@@ -338,11 +338,19 @@ export default function QuotesPage() {
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>CEO: {company.ceo} | Biz No: {company.bizNo}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
-                                <p style={{ margin: '2px 0', fontWeight: 600 }}>{company.bank}</p>
+                                <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
                             </div>
-                            {company.stampUrl && <img src={company.stampUrl} alt="Stamp" style={{ position: 'absolute', right: '-10px', bottom: '-40px', width: '90px', opacity: 0.85, zIndex: 1 }} />}
                         </div>
                     </div>
+
+                    {/* Client Info Section */}
+                    {/* ... (Client Info Section 생략 - 변경 없음) ... */}
+
+                    {/* (Client Info Section 코드 블록이 너무 길어서 끊길 수 있으므로, 헤더 부분만 먼저 교체하고 하단은 별도로 교체하거나, 전체 구조가 파악되었으니 안전하게 부분 교체 진행) */}
+                    {/* 여기서는 헤더 부분만 교체하고, 하단은 별도 청크로 처리하는 것이 안전함. 하지만 tool call은 한번에 하나의 파일만 건드려야 하므로, multi_replace 사용 불가. replace_file_content는 하나만 됨. */}
+                    {/* 따라서 헤더 부분과 하단 부분을 포함할 수 없으므로(Client Info와 Table이 중간에 낌), 일단 헤더만 수정하고 다시 호출해서 하단 수정. */}
+                    {/* 아, replace_file_content는 contiguous block만 가능하므로 2번 호출해야 함. */}
+                    {/* 일단 이 툴 호출에서는 '헤더' 부분만 처리하고, 이어서 '하단' 처리. */}
 
                     {/* Client Info Section */}
                     <div style={{ display: 'flex', gap: '40px', marginBottom: '40px' }}>
@@ -408,23 +416,51 @@ export default function QuotesPage() {
                     </table>
 
                     {/* Bottom Section */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '30px' }}>
-                        <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '20px' }}>
-                            <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 15px 0', paddingBottom: '8px', borderBottom: '1.5px solid #1a202c', display: 'inline-block' }}>SPECIAL NOTES & TERMS</h4>
-                            <div style={{ fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
-                                {printData.specialNotes || '1. Delivery: To be discussed after P.O\n2. Payment: Cash/Transfer\n3. Validity: 1 Month from the above date\n4. Tax: VAT 10% separate unless specified'}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '30px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '20px', minHeight: '120px' }}>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 10px 0', color: '#2d3748' }}>SPECIAL NOTES & TERMS</h4>
+                                <div style={{ fontSize: '0.85rem', color: '#4a5568', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                                    {printData.specialNotes || '1. Delivery: To be discussed after P.O\n2. Payment: Cash/Transfer\n3. Validity: 1 Month from the above date\n4. Tax: VAT 10% separate unless specified'}
+                                </div>
+                            </div>
+                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '20px' }}>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 10px 0', color: '#2d3748' }}>BANK INFORMATION</h4>
+                                {printData.currency === 'KRW' ? (
+                                    <p style={{ fontSize: '0.9rem', color: '#1a202c', fontWeight: 600 }}>{company.bank}</p>
+                                ) : (
+                                    <div style={{ fontSize: '0.85rem', color: '#1a202c' }}>
+                                        <p style={{ margin: '0 0 4px 0', fontWeight: 600 }}>{company.bankForeign1}</p>
+                                        <p style={{ margin: 0 }}>{company.bankForeign2}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '15px' }}>
                                 <p style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '10px', fontWeight: 700 }}>PREPARED BY</p>
-                                <div style={{ height: '50px' }}></div>
+                                <div style={{ height: '40px' }}></div>
                             </div>
-                            <div style={{ border: '1px solid #1a202c', borderRadius: '8px', padding: '15px', background: '#f8fafc' }}>
+                            <div style={{ border: '1px solid #1a202c', borderRadius: '8px', padding: '15px', background: '#f8fafc', position: 'relative', minHeight: '150px' }}>
                                 <p style={{ fontSize: '0.75rem', color: '#1a202c', marginBottom: '10px', fontWeight: 800 }}>AUTHORIZED APPROVAL</p>
-                                <div style={{ height: '50px', display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                                <div style={{ position: 'absolute', bottom: '15px', right: '15px', textAlign: 'right', width: '100%', zIndex: 2 }}>
                                     <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>(Sign or Seal)</p>
                                 </div>
+                                {company.stampUrl && (
+                                    <img
+                                        src={company.stampUrl}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '50%',
+                                            bottom: '10px',
+                                            width: '240px',
+                                            opacity: 0.9,
+                                            transform: 'translateX(50%)',
+                                            zIndex: 1
+                                        }}
+                                    />
+                                )}
                             </div>
                         </div>
                     </div>

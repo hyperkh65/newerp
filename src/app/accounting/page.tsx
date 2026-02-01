@@ -394,10 +394,8 @@ export default function AccountingPage() {
                             <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>{company.name}</p>
                             <p style={{ fontSize: '0.85rem' }}>{company.address}</p>
                             <p style={{ fontSize: '0.85rem' }}>TEL: {company.tel} / FAX: {company.fax}</p>
+                            <p style={{ fontSize: '0.85rem' }}>EMAIL: {company.email || ''}</p>
                             <p style={{ fontSize: '0.85rem' }}>BIZ NO: {company.bizNo}</p>
-                            <div style={{ marginTop: '10px' }}>
-                                {company.stampUrl && <img src={company.stampUrl} width="80" style={{ opacity: 0.9 }} />}
-                            </div>
                         </div>
                     </div>
 
@@ -438,15 +436,37 @@ export default function AccountingPage() {
                     </table>
 
                     <div style={{ marginTop: '50px', borderTop: '2px solid #000', paddingTop: '20px' }}>
-                        <p style={{ fontWeight: 800, marginBottom: '10px' }}>BANK INFORMATION:</p>
-                        {printData.currency === 'KRW' ? (
-                            <p style={{ fontSize: '0.9rem' }}>{company.bank}</p>
-                        ) : (
-                            <>
-                                <p style={{ fontSize: '0.9rem' }}>{company.bankForeign1}</p>
-                                <p style={{ fontSize: '0.9rem' }}>{company.bankForeign2}</p>
-                            </>
-                        )}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <p style={{ fontWeight: 800, marginBottom: '10px' }}>BANK INFORMATION:</p>
+                                {printData.currency === 'KRW' ? (
+                                    <p style={{ fontSize: '0.9rem' }}>{company.bank}</p>
+                                ) : (
+                                    <>
+                                        <p style={{ fontSize: '0.9rem' }}>{company.bankForeign1}</p>
+                                        <p style={{ fontSize: '0.9rem' }}>{company.bankForeign2}</p>
+                                    </>
+                                )}
+                            </div>
+                            <div style={{ textAlign: 'right', position: 'relative', width: '300px' }}>
+                                <p style={{ fontWeight: 800, marginBottom: '60px' }}>AUTHORIZED SIGNATURE</p>
+                                <div style={{ borderBottom: '1px solid #000', marginBottom: '5px' }}></div>
+                                <p style={{ fontSize: '0.8rem' }}>{company.name}</p>
+                                {company.stampUrl && (
+                                    <img
+                                        src={company.stampUrl}
+                                        width="320"
+                                        style={{
+                                            position: 'absolute',
+                                            top: '0',
+                                            right: '0',
+                                            opacity: 0.85,
+                                            transform: 'translate(20%, -30%)'
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </div>
                         <div style={{ marginTop: '40px', textAlign: 'center' }}>
                             <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>Thank you for your business!</p>
                         </div>

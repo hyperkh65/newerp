@@ -61,9 +61,21 @@ export default function SettingsPage() {
                                 <label style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>팩스번호</label>
                                 <input value={settings.fax} onChange={e => setSettings({ ...settings, fax: e.target.value })} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem', color: 'white' }} />
                             </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>이메일</label>
+                                <input value={settings.email} onChange={e => setSettings({ ...settings, email: e.target.value })} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem', color: 'white' }} />
+                            </div>
                             <div style={{ gridColumn: 'span 2' }}>
-                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>입금 계좌 정보</label>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>입금 계좌 (국내)</label>
                                 <input value={settings.bank} onChange={e => setSettings({ ...settings, bank: e.target.value })} placeholder="은행명 계좌번호 (예금주)" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem', color: 'white' }} />
+                            </div>
+                            <div style={{ gridColumn: 'span 2' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>입금 계좌 (해외) - 라인 1</label>
+                                <input value={settings.bankForeign1} onChange={e => setSettings({ ...settings, bankForeign1: e.target.value })} placeholder="BANK NAME / SWIFT CODE" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem', color: 'white' }} />
+                            </div>
+                            <div style={{ gridColumn: 'span 2' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>입금 계좌 (해외) - 라인 2</label>
+                                <input value={settings.bankForeign2} onChange={e => setSettings({ ...settings, bankForeign2: e.target.value })} placeholder="ACCOUNT NO / NAME" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem', color: 'white' }} />
                             </div>
                         </div>
                         <button onClick={handleSave} style={{ marginTop: '2.5rem', width: '100%', background: 'var(--accent-gradient)', border: 'none', padding: '1rem', borderRadius: '12px', color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
