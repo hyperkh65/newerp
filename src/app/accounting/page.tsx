@@ -375,14 +375,27 @@ export default function AccountingPage() {
             <div style={{ background: 'white', color: 'black', minHeight: '100vh', padding: '40px' }} id="print-area">
                 <style>{`
                     @media print { 
-                        body * { visibility: hidden; } 
-                        #print-area, #print-area * { visibility: visible; } 
-                        #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; } 
-                        .no-print { display: none; } 
-                        @page { size: auto; margin: 10mm; }
+                        /* Hide everything else */
+                        body * { visibility: hidden !important; }
+                        aside, header, nav, .no-print, .sidebar { display: none !important; }
+                        
+                        /* Show only the print area */
+                        #print-area, #print-area * { visibility: visible !important; } 
+                        #print-area { 
+                            position: fixed !important; 
+                            left: 0 !important; 
+                            top: 0 !important; 
+                            width: 100% !important; 
+                            height: 100% !important;
+                            padding: 0 !important; 
+                            margin: 0 !important;
+                            background: white !important;
+                        } 
+                        
+                        @page { size: auto; margin: 15mm; }
                     }
-                    .dn-table th { background: #f0f0f0; border: 1px solid #ccc; padding: 10px; font-size: 13px; text-align: center; font-weight: 700; }
-                    .dn-table td { border: 1px solid #ccc; padding: 10px; font-size: 13px; }
+                    .dn-table th { background: #f0f0f0 !important; border: 1px solid #333; padding: 10px; font-size: 13px; text-align: center; font-weight: 700; -webkit-print-color-adjust: exact; }
+                    .dn-table td { border: 1px solid #333; padding: 10px; font-size: 13px; }
                     .box-container { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid #333; margin-bottom: 30px; }
                     .box-left { border-right: 1px solid #333; padding: 20px; position: relative; }
                     .box-right { padding: 20px; position: relative; }
@@ -428,25 +441,31 @@ export default function AccountingPage() {
                         <div className="box-right">
                             <p className="info-label">공급자 (SELLER)</p>
                             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0' }}>{company.name}</h2>
-                            <div style={{ fontSize: '1rem', lineHeight: '1.8' }}>
+                            <div style={{ fontSize: '1rem', lineHeight: '1.8', position: 'relative' }}>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>등록번호:</span> {company.bizNo}</p>
-                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>대표자:</span> {company.ceo} (인)</p>
+                                <p style={{ position: 'relative', zIndex: 2 }}>
+                                    <span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>대표자:</span> {company.ceo}
+                                    <span style={{ marginLeft: '10px' }}>(인)</span>
+                                    {company.stampUrl && (
+                                        <img
+                                            src={company.stampUrl}
+                                            alt="Stamp"
+                                            style={{
+                                                position: 'absolute',
+                                                top: '-15px',
+                                                left: '120px',
+                                                width: '75px',
+                                                height: '75px',
+                                                opacity: 0.85,
+                                                zIndex: 1,
+                                                pointerEvents: 'none'
+                                            }}
+                                        />
+                                    )}
+                                </p>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>주소:</span> {company.address}</p>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>업태:</span> {company.bizType} <span style={{ margin: '0 10px' }}>/</span> <span style={{ fontWeight: 600 }}>종목:</span> {company.bizItem}</p>
                             </div>
-                            {company.stampUrl && (
-                                <img
-                                    src={company.stampUrl}
-                                    alt="Stamp"
-                                    style={{
-                                        position: 'absolute',
-                                        top: '20px',
-                                        right: '20px',
-                                        width: '80px',
-                                        opacity: 0.9
-                                    }}
-                                />
-                            )}
                         </div>
                     </div>
 
@@ -511,8 +530,22 @@ export default function AccountingPage() {
                                 </div>
                             )}
                         </div>
-                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '1px' }}>위 금액을 정히 영수(청구)함.</h3>
+                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '1px', zIndex: 2 }}>위 금액을 정히 영수(청구)함.</h3>
+                            {company.stampUrl && (
+                                <img
+                                    src={company.stampUrl}
+                                    alt="Stamp"
+                                    style={{
+                                        position: 'absolute',
+                                        right: '20%',
+                                        width: '90px',
+                                        opacity: 0.35,
+                                        zIndex: 1,
+                                        transform: 'rotate(-5deg)'
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
 

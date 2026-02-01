@@ -356,13 +356,27 @@ export default function PurchaseOrdersPage() {
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
                     @media print { 
-                        body * { visibility: hidden; } 
-                        #print-area, #print-area * { visibility: visible; } 
-                        #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; } 
-                        .no-print { display: none; } 
+                        /* Hide everything else */
+                        body * { visibility: hidden !important; }
+                        aside, header, nav, .no-print, .sidebar { display: none !important; }
+                        
+                        /* Show only the print area */
+                        #print-area, #print-area * { visibility: visible !important; } 
+                        #print-area { 
+                            position: fixed !important; 
+                            left: 0 !important; 
+                            top: 0 !important; 
+                            width: 100% !important; 
+                            height: 100% !important;
+                            padding: 0 !important; 
+                            margin: 0 !important;
+                            background: white !important;
+                        } 
                         .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
                         .attach-item { margin-bottom: 40px; break-inside: avoid; }
                         .attach-img { max-width: 100%; height: auto; max-height: 480px; border: 1px solid #dcdde1; border-radius: 8px; margin-bottom: 15px; display: block; }
+
+                        @page { size: auto; margin: 15mm; }
                     }
                     .pi-table th { background: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; font-weight: 500; font-size: 11px; text-align: center; }
                     .pi-table td { font-size: 11px; border: 0.5px solid #dcdde1; }
@@ -382,14 +396,28 @@ export default function PurchaseOrdersPage() {
                         </div>
                         <div style={{ textAlign: 'right', position: 'relative' }}>
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 5px 0' }}>{company.name}</h2>
-                            <div style={{ fontSize: '0.85rem', color: '#353b48', lineHeight: '1.4' }}>
+                            <div style={{ fontSize: '0.85rem', color: '#353b48', lineHeight: '1.4', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
+                                <p style={{ margin: '2px 0', position: 'relative', zIndex: 2 }}>
+                                    CEO: {company.ceo} (인)
+                                    {company.stampUrl && (
+                                        <img
+                                            src={company.stampUrl}
+                                            style={{
+                                                position: 'absolute',
+                                                right: '-5px',
+                                                top: '-20px',
+                                                width: '60px',
+                                                opacity: 0.8,
+                                                zIndex: 1,
+                                                pointerEvents: 'none'
+                                            }}
+                                        />
+                                    )}
+                                </p>
                                 <p style={{ margin: '2px 0' }}>Biz No: {company.bizNo}</p>
                                 <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
-                                <div style={{ marginTop: '5px', display: 'inline-block', background: 'rgba(230,126,34,0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#e67e22' }}>
-                                    업태: {company.bizType} / 종목: {company.bizItem}
-                                </div>
                             </div>
                         </div>
                     </div>
