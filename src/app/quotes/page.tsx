@@ -335,17 +335,21 @@ export default function QuotesPage() {
                         }
 
                         #print-area { 
-                            position: fixed !important; 
+                            position: absolute !important; 
                             left: 0 !important; 
                             top: 0 !important; 
                             width: 100% !important; 
-                            height: 100% !important;
-                            padding: 0 !important; 
                             margin: 0 !important;
+                            padding: 0 !important; 
                             background: white !important;
                             z-index: 9999 !important;
                         } 
-                        .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
+                        
+                        /* Multi-page support */
+                        table { page-break-inside: auto; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                        tfoot { display: table-footer-group; }                        .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
                         .attach-item { margin-bottom: 40px; break-inside: avoid; }
                         .attach-img { max-width: 100%; height: auto; max-height: 480px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: block; }
                         
@@ -358,12 +362,15 @@ export default function QuotesPage() {
 
                 <div style={{ padding: '50px 40px' }}>
                     {/* Header Top Section */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
-                        <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative' }}>
+                        {company.logoUrl && (
+                            <img src={company.logoUrl} alt="Logo" style={{ height: '70px', maxWidth: '180px', objectFit: 'contain' }} />
+                        )}
+                        <div style={{ flex: 1, textAlign: 'center' }}>
                             <h1 style={{ fontSize: '3.5rem', fontWeight: 900, letterSpacing: '8px', margin: '0 0 10px 0', color: '#1a202c' }}>
                                 {printData.docType === 'PROFORMA' ? 'PROFORMA INVOICE' : 'QUOTATION'}
                             </h1>
-                            <div style={{ background: '#1a202c', height: '4px', width: '100px', marginBottom: '20px' }}></div>
+                            <div style={{ background: '#1a202c', height: '4px', width: '100px', margin: '0 auto 20px auto' }}></div>
                             <div style={{ fontSize: '1.1rem', color: '#4a5568' }}>
                                 <p style={{ margin: '5px 0' }}>Ref No: <span style={{ fontWeight: 700, color: '#1a202c' }}>{printData.no}</span></p>
                                 <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700, color: '#1a202c' }}>{printData.date}</span></p>
@@ -373,22 +380,8 @@ export default function QuotesPage() {
                             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.5', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
-                                <p style={{ margin: '2px 0', position: 'relative', zIndex: 2 }}>
+                                <p style={{ margin: '2px 0' }}>
                                     CEO: {company.ceo} (인) | Biz No: {company.bizNo}
-                                    {company.stampUrl && (
-                                        <img
-                                            src={company.stampUrl}
-                                            style={{
-                                                position: 'absolute',
-                                                left: '40px',
-                                                top: '-20px',
-                                                width: '60px',
-                                                opacity: 0.8,
-                                                zIndex: 1,
-                                                pointerEvents: 'none'
-                                            }}
-                                        />
-                                    )}
                                 </p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
                                 <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
@@ -504,22 +497,25 @@ export default function QuotesPage() {
                                 <p style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '10px', fontWeight: 700 }}>PREPARED BY</p>
                                 <div style={{ height: '40px' }}></div>
                             </div>
-                            <div style={{ border: '1px solid #1a202c', borderRadius: '8px', padding: '15px', background: '#f8fafc', position: 'relative', minHeight: '150px' }}>
+                            <div style={{ border: '1px solid #1a202c', borderRadius: '8px', padding: '15px', background: '#f8fafc', position: 'relative', minHeight: '160px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                 <p style={{ fontSize: '0.75rem', color: '#1a202c', marginBottom: '10px', fontWeight: 800 }}>AUTHORIZED APPROVAL</p>
-                                <div style={{ position: 'absolute', bottom: '15px', right: '15px', textAlign: 'right', width: '100%', zIndex: 2 }}>
-                                    <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>(Sign or Seal)</p>
+                                <div style={{ textAlign: 'right', width: '100%', zIndex: 2 }}>
+                                    <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700 }}>{company.name}</p>
+                                    <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.5 }}>(Sign or Seal)</p>
                                 </div>
                                 {company.stampUrl && (
                                     <img
                                         src={company.stampUrl}
                                         style={{
                                             position: 'absolute',
-                                            right: '50%',
-                                            bottom: '-10px',
-                                            width: '320px',
-                                            opacity: 0.9,
-                                            transform: 'translateX(60%) rotate(-5deg)',
-                                            zIndex: 1
+                                            right: '10%',
+                                            bottom: '10px',
+                                            width: '160px',
+                                            height: '160px',
+                                            opacity: 0.65,
+                                            transform: 'rotate(-5deg)',
+                                            zIndex: 1,
+                                            pointerEvents: 'none'
                                         }}
                                     />
                                 )}
@@ -543,31 +539,33 @@ export default function QuotesPage() {
                 </div>
 
                 {/* Appendix Page for Attachments */}
-                {(printData.attach1 || printData.attach2 || printData.attach3 || printData.attacht1 || printData.attacht2 || printData.attacht3) && (
-                    <div className="appendix-page">
-                        <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1a202c', borderBottom: '4px solid #1a202c', paddingBottom: '12px', marginBottom: '40px', letterSpacing: '2px', textAlign: 'center' }}>ATTACHMENTS & SPECIFICATIONS</h2>
+                {
+                    (printData.attach1 || printData.attach2 || printData.attach3 || printData.attacht1 || printData.attacht2 || printData.attacht3) && (
+                        <div className="appendix-page">
+                            <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1a202c', borderBottom: '4px solid #1a202c', paddingBottom: '12px', marginBottom: '40px', letterSpacing: '2px', textAlign: 'center' }}>ATTACHMENTS & SPECIFICATIONS</h2>
 
-                        {[1, 2, 3].map(n => {
-                            const img = (printData as any)[`attach${n}`];
-                            const text = (printData as any)[`attacht${n}`];
-                            if (!img && !text) return null;
-                            return (
-                                <div key={n} className="attach-item">
-                                    <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '15px', color: '#1a202c', borderLeft: '5px solid #0070f3', paddingLeft: '12px' }}>
-                                        ATTACHMENT REF #{n}
-                                    </h3>
-                                    {img && <img src={img} className="attach-img" alt={`Attachment ${n}`} />}
-                                    {text && (
-                                        <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '1rem', lineHeight: '1.8', color: '#2d3748', whiteSpace: 'pre-wrap' }}>
-                                            {text}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+                            {[1, 2, 3].map(n => {
+                                const img = (printData as any)[`attach${n}`];
+                                const text = (printData as any)[`attacht${n}`];
+                                if (!img && !text) return null;
+                                return (
+                                    <div key={n} className="attach-item">
+                                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '15px', color: '#1a202c', borderLeft: '5px solid #0070f3', paddingLeft: '12px' }}>
+                                            ATTACHMENT REF #{n}
+                                        </h3>
+                                        {img && <img src={img} className="attach-img" alt={`Attachment ${n}`} />}
+                                        {text && (
+                                            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '1rem', lineHeight: '1.8', color: '#2d3748', whiteSpace: 'pre-wrap' }}>
+                                                {text}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )
+                }
+            </div >
         );
     }
 

@@ -375,31 +375,26 @@ export default function AccountingPage() {
             <div style={{ background: 'white', color: 'black', minHeight: '100vh', padding: '40px' }} id="print-area">
                 <style>{`
                     @media print { 
-                        /* Hide everything by default */
                         body * { visibility: hidden !important; }
                         aside, header, nav, .sidebar, [role="complementary"] { display: none !important; }
-                        
-                        /* Show only the print area */
                         #print-area, #print-area * { visibility: visible !important; } 
-                        
-                        /* EXPLICITLY HIDE no-print elements even inside print-area */
-                        .no-print, .no-print * { 
-                            visibility: hidden !important; 
-                            display: none !important; 
-                        }
+                        .no-print, .no-print * { display: none !important; }
 
                         #print-area { 
-                            position: fixed !important; 
+                            position: absolute !important; 
                             left: 0 !important; 
                             top: 0 !important; 
                             width: 100% !important; 
-                            height: 100% !important;
-                            padding: 0 !important; 
                             margin: 0 !important;
+                            padding: 0 !important; 
                             background: white !important;
                             z-index: 9999 !important;
                         } 
                         
+                        table { page-break-inside: auto; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                        tfoot { display: table-footer-group; }                        
                         @page { size: auto; margin: 15mm; }
                     }
                     .dn-table th { background: #f0f0f0 !important; border: 1px solid #333; padding: 10px; font-size: 13px; text-align: center; font-weight: 700; -webkit-print-color-adjust: exact; }
@@ -427,11 +422,24 @@ export default function AccountingPage() {
                 </div>
 
                 <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-
                     {/* Header */}
-                    <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '20px' }}>
-                        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, textDecoration: 'underline', textUnderlineOffset: '10px', letterSpacing: '10px', margin: '0 0 15px 0' }}>거 래 명 세 표</h1>
-                        <p style={{ fontSize: '1.2rem', fontWeight: 600 }}>No: {printData.invoiceNo}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', marginTop: '20px', position: 'relative' }}>
+                        {company.logoUrl && (
+                            <img src={company.logoUrl} alt="Logo" style={{ height: '80px', maxWidth: '200px', objectFit: 'contain' }} />
+                        )}
+                        <h1 style={{
+                            fontSize: '3.5rem',
+                            fontWeight: 900,
+                            textDecoration: 'underline',
+                            textUnderlineOffset: '10px',
+                            letterSpacing: '10px',
+                            margin: 0,
+                            flex: 1,
+                            textAlign: 'center'
+                        }}>거 래 명 세 표</h1>
+                        <div style={{ textAlign: 'right', minWidth: '150px' }}>
+                            <p style={{ fontSize: '1.2rem', fontWeight: 600 }}>No: {printData.invoiceNo}</p>
+                        </div>
                     </div>
 
                     {/* Buyer & Seller Info Box */}
@@ -449,31 +457,15 @@ export default function AccountingPage() {
                         <div className="box-right">
                             <p className="info-label">공급자 (SELLER)</p>
                             <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0' }}>{company.name}</h2>
-                            <div style={{ fontSize: '1rem', lineHeight: '1.8', position: 'relative' }}>
+                            <div style={{ fontSize: '1rem', lineHeight: '1.8' }}>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>등록번호:</span> {company.bizNo}</p>
-                                <p style={{ position: 'relative', zIndex: 2 }}>
+                                <p>
                                     <span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>대표자:</span> {company.ceo}
                                     <span style={{ marginLeft: '10px' }}>(인)</span>
                                 </p>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>주소:</span> {company.address}</p>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>업태:</span> {company.bizType} <span style={{ margin: '0 10px' }}>/</span> <span style={{ fontWeight: 600 }}>종목:</span> {company.bizItem}</p>
                             </div>
-                            {company.stampUrl && (
-                                <img
-                                    src={company.stampUrl}
-                                    alt="Stamp"
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: '10px',
-                                        right: '10px',
-                                        width: '130px',
-                                        height: '130px',
-                                        opacity: 0.85,
-                                        zIndex: 1,
-                                        pointerEvents: 'none'
-                                    }}
-                                />
-                            )}
                         </div>
                     </div>
 
@@ -538,25 +530,27 @@ export default function AccountingPage() {
                                 </div>
                             )}
                         </div>
-                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-                            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '1px', zIndex: 2 }}>위 금액을 정히 영수(청구)함.</h3>
+                        <div style={{ border: '1px solid #ccc', padding: '30px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', minHeight: '120px' }}>
+                            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, letterSpacing: '2px', zIndex: 2 }}>위 금액을 정히 영수(청구)함.</h3>
                             {company.stampUrl && (
                                 <img
                                     src={company.stampUrl}
                                     alt="Stamp"
                                     style={{
                                         position: 'absolute',
-                                        right: '20%',
-                                        width: '90px',
-                                        opacity: 0.35,
+                                        right: '10%',
+                                        bottom: '10px',
+                                        width: '160px',
+                                        height: '160px',
+                                        opacity: 0.45,
                                         zIndex: 1,
-                                        transform: 'rotate(-5deg)'
+                                        transform: 'rotate(-5deg)',
+                                        pointerEvents: 'none'
                                     }}
                                 />
                             )}
                         </div>
                     </div>
-
                     <div style={{ marginTop: '30px', textAlign: 'center', fontSize: '0.8rem', color: '#888' }}>
                         본 명세표는 인터넷으로 발행되었습니다. / 문의: {company.email}
                     </div>

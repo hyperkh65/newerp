@@ -370,17 +370,21 @@ export default function PurchaseOrdersPage() {
                         }
 
                         #print-area { 
-                            position: fixed !important; 
+                            position: absolute !important; 
                             left: 0 !important; 
                             top: 0 !important; 
                             width: 100% !important; 
-                            height: 100% !important;
-                            padding: 0 !important; 
                             margin: 0 !important;
+                            padding: 0 !important; 
                             background: white !important;
                             z-index: 9999 !important;
                         } 
-                        .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
+                        
+                        /* Multi-page support */
+                        table { page-break-inside: auto; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                        tfoot { display: table-footer-group; }                        .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
                         .attach-item { margin-bottom: 40px; break-inside: avoid; }
                         .attach-img { max-width: 100%; height: auto; max-height: 480px; border: 1px solid #dcdde1; border-radius: 8px; margin-bottom: 15px; display: block; }
 
@@ -393,10 +397,13 @@ export default function PurchaseOrdersPage() {
 
                 <div style={{ padding: '50px 40px' }}>
                     {/* Header Top Section */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
-                        <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative' }}>
+                        {company.logoUrl && (
+                            <img src={company.logoUrl} alt="Logo" style={{ height: '70px', maxWidth: '180px', objectFit: 'contain' }} />
+                        )}
+                        <div style={{ flex: 1, textAlign: 'center' }}>
                             <h1 style={{ fontSize: '3.2rem', fontWeight: 900, letterSpacing: '4px', margin: '0 0 10px 0', color: '#2c3e50' }}>PURCHASE ORDER</h1>
-                            <div style={{ background: '#e67e22', height: '6px', width: '120px', marginBottom: '20px' }}></div>
+                            <div style={{ background: '#e67e22', height: '6px', width: '120px', margin: '0 auto 20px auto' }}></div>
                             <div style={{ fontSize: '1.1rem', color: '#2f3640' }}>
                                 <p style={{ margin: '5px 0' }}>P.O No: <span style={{ fontWeight: 700, color: '#c23616' }}>{printData.no}</span></p>
                                 <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700 }}>{printData.date}</span></p>
@@ -407,22 +414,8 @@ export default function PurchaseOrdersPage() {
                             <div style={{ fontSize: '0.85rem', color: '#353b48', lineHeight: '1.4', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
-                                <p style={{ margin: '2px 0', position: 'relative', zIndex: 2 }}>
+                                <p style={{ margin: '2px 0' }}>
                                     CEO: {company.ceo} (인)
-                                    {company.stampUrl && (
-                                        <img
-                                            src={company.stampUrl}
-                                            style={{
-                                                position: 'absolute',
-                                                right: '-5px',
-                                                top: '-20px',
-                                                width: '60px',
-                                                opacity: 0.8,
-                                                zIndex: 1,
-                                                pointerEvents: 'none'
-                                            }}
-                                        />
-                                    )}
                                 </p>
                                 <p style={{ margin: '2px 0' }}>Biz No: {company.bizNo}</p>
                                 <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
@@ -519,9 +512,9 @@ export default function PurchaseOrdersPage() {
                                 )}
                             </div>
                         </div>
-                        <div style={{ border: '1px solid #dcdde1', borderRadius: '4px', padding: '15px', position: 'relative', minHeight: '180px' }}>
+                        <div style={{ border: '1px solid #dcdde1', borderRadius: '4px', padding: '15px', position: 'relative', minHeight: '150px' }}>
                             <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7f8c8d', marginBottom: '40px' }}>AUTHORIZED SIGNATURE</p>
-                            <div style={{ textAlign: 'center', position: 'absolute', bottom: '20px', left: '0', userSelect: 'none', width: '100%' }}>
+                            <div style={{ textAlign: 'center', position: 'absolute', bottom: '20px', left: '0', userSelect: 'none', width: '100%', zIndex: 2 }}>
                                 <div style={{ height: '1px', background: '#2c3e50', width: '80%', margin: '0 auto 10px auto' }}></div>
                                 <p style={{ fontSize: '0.8rem', fontWeight: 800 }}>{company.name}</p>
                             </div>
@@ -531,12 +524,14 @@ export default function PurchaseOrdersPage() {
                                     alt="Stamp"
                                     style={{
                                         position: 'absolute',
-                                        left: '50%',
-                                        bottom: '20px',
-                                        transform: 'translateX(-40%) rotate(-5deg)',
-                                        width: '320px',
-                                        opacity: 0.9,
-                                        zIndex: 1
+                                        right: '5%',
+                                        bottom: '10px',
+                                        width: '160px',
+                                        height: '160px',
+                                        opacity: 0.65,
+                                        zIndex: 1,
+                                        transform: 'rotate(-5deg)',
+                                        pointerEvents: 'none'
                                     }}
                                 />
                             )}

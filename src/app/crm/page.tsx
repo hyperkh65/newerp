@@ -306,17 +306,21 @@ export default function SalesManagementPage() {
                         }
 
                         #print-area { 
-                            position: fixed !important; 
+                            position: absolute !important; 
                             left: 0 !important; 
                             top: 0 !important; 
                             width: 100% !important; 
-                            height: 100% !important;
-                            padding: 0 !important; 
                             margin: 0 !important;
+                            padding: 0 !important; 
                             background: white !important;
                             z-index: 9999 !important;
                         } 
                         
+                        /* Multi-page support */
+                        table { page-break-inside: auto; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                        tfoot { display: table-footer-group; }                        
                         @page { size: auto; margin: 15mm; }
                     }
                     .statement-table th { background: #f8fafc !important; color: #1e293b !important; border: 1px solid #cbd5e1; font-weight: 700; font-size: 11px; height: 35px; }
@@ -326,9 +330,14 @@ export default function SalesManagementPage() {
                 `}</style>
 
                 <div style={{ padding: '30px 40px' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-                        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, textDecoration: 'underline', textUnderlineOffset: '8px', letterSpacing: '10px', margin: 0 }}>거 래 명 세 표</h1>
-                        <p style={{ marginTop: '8px', fontSize: '1rem' }}>No: {printData.code}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', position: 'relative' }}>
+                        {company.logoUrl && (
+                            <img src={company.logoUrl} alt="Logo" style={{ height: '70px', maxWidth: '180px', objectFit: 'contain' }} />
+                        )}
+                        <div style={{ flex: 1, textAlign: 'center' }}>
+                            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, textDecoration: 'underline', textUnderlineOffset: '8px', letterSpacing: '10px', margin: 0 }}>거 래 명 세 표</h1>
+                            <p style={{ marginTop: '8px', fontSize: '1rem' }}>No: {printData.code}</p>
+                        </div>
                     </div>
 
                     <div className="info-grid">
@@ -351,9 +360,6 @@ export default function SalesManagementPage() {
                                         <p>주소: {company.address}</p>
                                         <p>업태: {company.bizType || '도소매'} / 종목: {company.bizItem || '전자부품, 조명기구'}</p>
                                     </div>
-                                </div>
-                                <div style={{ position: 'relative', width: '120px', height: '120px' }}>
-                                    {company.stampUrl && <img src={company.stampUrl} alt="Stamp" style={{ position: 'absolute', right: 0, bottom: 0, width: '120px', height: '120px', opacity: 0.85 }} />}
                                 </div>
                             </div>
                         </div>
@@ -418,8 +424,25 @@ export default function SalesManagementPage() {
                             <p style={{ fontSize: '0.85rem', marginBottom: '8px', color: '#64748b' }}>[입금계좌 안내]</p>
                             <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e293b' }}>{company.bank}</p>
                         </div>
-                        <div style={{ padding: '15px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <p style={{ fontSize: '1.2rem', fontWeight: 900 }}>위 금액을 정히 영수(청구)함.</p>
+                        <div style={{ padding: '15px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', minHeight: '100px' }}>
+                            <p style={{ fontSize: '1.2rem', fontWeight: 900, zIndex: 2 }}>위 금액을 정히 영수(청구)함.</p>
+                            {company.stampUrl && (
+                                <img
+                                    src={company.stampUrl}
+                                    alt="Stamp"
+                                    style={{
+                                        position: 'absolute',
+                                        right: '10%',
+                                        width: '160px',
+                                        height: '160px',
+                                        opacity: 0.4,
+                                        zIndex: 1,
+                                        transform: 'rotate(-5deg)',
+                                        pointerEvents: 'none',
+                                        bottom: '10px'
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
 
