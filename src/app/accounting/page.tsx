@@ -15,7 +15,7 @@ import {
 import Modal from '@/components/Modal';
 import ProductPicker from '@/components/ProductPicker';
 import QuotePicker from '@/components/QuotePicker';
-import { getSettings } from '@/lib/settings';
+import { getSettings, CompanySettings, fetchCompanySettings } from '@/lib/settings';
 
 interface InvoiceItem {
     id: string | number;
@@ -58,7 +58,7 @@ export default function AccountingPage() {
     const [isProductPickerOpen, setIsProductPickerOpen] = useState(false);
     const [isQuotePickerOpen, setIsQuotePickerOpen] = useState(false);
     const [printData, setPrintData] = useState<Invoice | null>(null);
-    const [company] = useState(getSettings());
+    const [company, setCompany] = useState<CompanySettings>(getSettings());
 
     // Search & Filter
     const [search, setSearch] = useState('');
@@ -95,6 +95,7 @@ export default function AccountingPage() {
     });
 
     useEffect(() => {
+        fetchCompanySettings().then(setCompany);
         fetchData();
     }, []);
 
@@ -378,126 +379,145 @@ export default function AccountingPage() {
                         #print-area, #print-area * { visibility: visible; } 
                         #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; } 
                         .no-print { display: none; } 
+                        @page { size: auto; margin: 10mm; }
                     }
-                    .dn-table th { background: #f0f0f0; border: 1px solid #000; padding: 10px; font-size: 13px; }
-                    .dn-table td { border: 1px solid #000; padding: 10px; font-size: 13px; }
+                    .dn-table th { background: #f0f0f0; border: 1px solid #ccc; padding: 10px; font-size: 13px; text-align: center; font-weight: 700; }
+                    .dn-table td { border: 1px solid #ccc; padding: 10px; font-size: 13px; }
+                    .box-container { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid #333; margin-bottom: 30px; }
+                    .box-left { border-right: 1px solid #333; padding: 20px; position: relative; }
+                    .box-right { padding: 20px; position: relative; }
+                    .info-label { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
                 `}</style>
                 <div className="no-print" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-                    <button onClick={() => setView('all')} style={{ padding: '10px 20px', background: '#333', color: 'white', border: 'none', borderRadius: '5px' }}>
+                    <button onClick={() => setView('all')} style={{ padding: '10px 20px', background: '#333', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
                         <ArrowLeft size={16} /> 뒤로가기
                     </button>
-                    <button onClick={() => window.print()} style={{ padding: '10px 20px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px' }}>
-                        <Printer size={16} /> 인쇄하기
+                    <button
+                        onClick={() => {
+                            const originalTitle = document.title;
+                            document.title = `${printData.issueDate}_거래명세표_${printData.invoiceNo}`;
+                            window.print();
+                            document.title = originalTitle;
+                        }}
+                        style={{ padding: '10px 20px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                    >
+                        <Printer size={16} /> 인쇄하기 (PDF 저장)
                     </button>
                 </div>
 
-                <div style={{ border: '3px solid #000', padding: '40px' }}>
-                    <h1 style={{ textAlign: 'center', fontSize: '3rem', fontWeight: 900, textDecoration: 'underline', marginBottom: '40px' }}>DEBIT NOTE</h1>
+                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px', marginBottom: '40px' }}>
-                        <div>
-                            <p style={{ fontWeight: 800, marginBottom: '5px', fontSize: '1.1rem' }}>TO: {printData.client}</p>
-                            {printData.clientInfo?.address && <p style={{ fontSize: '0.9rem', marginBottom: '2px' }}>{printData.clientInfo.address}</p>}
-                            {printData.clientInfo?.ceo && <p style={{ fontSize: '0.9rem', marginBottom: '2px' }}>ATTN: {printData.clientInfo.ceo}</p>}
-                            {printData.clientInfo?.bizNo && <p style={{ fontSize: '0.9rem', marginBottom: '10px' }}>BIZ NO: {printData.clientInfo.bizNo}</p>}
+                    {/* Header */}
+                    <div style={{ textAlign: 'center', marginBottom: '40px', marginTop: '20px' }}>
+                        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, textDecoration: 'underline', textUnderlineOffset: '10px', letterSpacing: '10px', margin: '0 0 15px 0' }}>거 래 명 세 표</h1>
+                        <p style={{ fontSize: '1.2rem', fontWeight: 600 }}>No: {printData.invoiceNo}</p>
+                    </div>
 
-                            <p style={{ fontSize: '0.9rem' }}>DATE: {printData.issueDate}</p>
-                            <p style={{ fontSize: '0.9rem' }}>REF NO: {printData.invoiceNo}</p>
-                            <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #000' }}>
-                                <p style={{ fontWeight: 800, fontSize: '0.9rem' }}>REASON FOR BILLING:</p>
-                                <p>{printData.billingReason}</p>
+                    {/* Buyer & Seller Info Box */}
+                    <div className="box-container">
+                        <div className="box-left">
+                            <p className="info-label">공급받는자 (BUYER)</p>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0' }}>{printData.client} <span style={{ fontSize: '1.1rem', fontWeight: 400 }}>귀하</span></h2>
+                            <div style={{ fontSize: '1rem', lineHeight: '2' }}>
+                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>일자:</span> {printData.issueDate}</p>
+                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>P.O No:</span> {printData.invoiceNo}</p>
+                                {printData.clientInfo?.bizNo && <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>등록번호:</span> {printData.clientInfo.bizNo}</p>}
+                                {printData.clientInfo?.address && <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>주소:</span> {printData.clientInfo.address}</p>}
                             </div>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>{company.name}</p>
-                            <p style={{ fontSize: '0.85rem' }}>{company.address}</p>
-                            <p style={{ fontSize: '0.85rem' }}>TEL: {company.tel} / FAX: {company.fax}</p>
-                            <p style={{ fontSize: '0.85rem' }}>EMAIL: {company.email || ''}</p>
-                            <p style={{ fontSize: '0.85rem' }}>BIZ NO: {company.bizNo}</p>
-                            <div style={{ marginTop: '5px', display: 'inline-block', background: 'rgba(0,112,243,0.1)', padding: '5px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#0070f3' }}>
-                                업태: {company.bizType} / 종목: {company.bizItem}
+                        <div className="box-right">
+                            <p className="info-label">공급자 (SELLER)</p>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0' }}>{company.name}</h2>
+                            <div style={{ fontSize: '1rem', lineHeight: '1.8' }}>
+                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>등록번호:</span> {company.bizNo}</p>
+                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>대표자:</span> {company.ceo} (인)</p>
+                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>주소:</span> {company.address}</p>
+                                <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>업태:</span> {company.bizType} <span style={{ margin: '0 10px' }}>/</span> <span style={{ fontWeight: 600 }}>종목:</span> {company.bizItem}</p>
                             </div>
+                            {company.stampUrl && (
+                                <img
+                                    src={company.stampUrl}
+                                    alt="Stamp"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '20px',
+                                        right: '20px',
+                                        width: '80px',
+                                        opacity: 0.9
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
 
-                    <table className="dn-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    {/* Table */}
+                    <table className="dn-table" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
                         <thead>
-                            <tr>
-                                <th style={{ width: '40%' }}>DESCRIPTION</th>
-                                <th>QTY</th>
-                                <th>UNIT PRICE</th>
-                                <th>AMOUNT</th>
+                            <tr style={{ height: '40px' }}>
+                                <th style={{ width: '50px' }}>No</th>
+                                <th>품명 및 규격 (DESCRIPTION)</th>
+                                <th style={{ width: '80px' }}>수량</th>
+                                <th style={{ width: '100px' }}>단가</th>
+                                <th style={{ width: '120px' }}>공급가액</th>
+                                <th style={{ width: '80px' }}>비고</th>
                             </tr>
                         </thead>
                         <tbody>
                             {(printData.items || []).map((it, idx) => (
                                 <tr key={idx}>
+                                    <td style={{ textAlign: 'center' }}>{idx + 1}</td>
                                     <td>
-                                        <div style={{ fontWeight: 700 }}>{it.product}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#555' }}>{it.productCode}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#555' }}>{it.description}</div>
+                                        <div style={{ fontWeight: 700, fontSize: '1rem' }}>{it.product}</div>
+                                        <div style={{ fontSize: '0.85rem', color: '#555', marginTop: '2px' }}>{it.description}</div>
                                     </td>
                                     <td style={{ textAlign: 'center' }}>{it.qty}</td>
-                                    <td style={{ textAlign: 'right' }}>{currencySymbol(printData.currency)} {it.unitPrice.toLocaleString()}</td>
-                                    <td style={{ textAlign: 'right', fontWeight: 700 }}>{currencySymbol(printData.currency)} {it.amount.toLocaleString()}</td>
+                                    <td style={{ textAlign: 'right' }}>{it.unitPrice.toLocaleString()}</td>
+                                    <td style={{ textAlign: 'right', fontWeight: 700 }}>{it.amount.toLocaleString()}</td>
+                                    <td style={{ textAlign: 'center' }}></td>
                                 </tr>
                             ))}
-                            {[...Array(Math.max(0, 5 - (printData.items?.length || 0)))].map((_, i) => (
-                                <tr key={`empty-${i}`} style={{ height: '40px' }}><td></td><td></td><td></td><td></td></tr>
+                            {[...Array(Math.max(0, 10 - (printData.items?.length || 0)))].map((_, i) => (
+                                <tr key={`empty-${i}`} style={{ height: '35px' }}>
+                                    <td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
                             ))}
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colSpan={3} style={{ textAlign: 'right', fontWeight: 900, fontSize: '1.2rem', padding: '15px' }}>TOTAL AMOUNT</td>
-                                <td style={{ textAlign: 'right', fontWeight: 900, fontSize: '1.2rem', padding: '15px', background: '#f9f9f9' }}>
-                                    {currencySymbol(printData.currency)} {printData.totalAmount.toLocaleString()}
+                                <td colSpan={2} style={{ textAlign: 'center', fontWeight: 700, padding: '15px' }}>부가가치세 (VAT 10%) - 별도 표기 없을 시 포함</td>
+                                <td colSpan={4} style={{ textAlign: 'right', fontWeight: 700, padding: '15px' }}>
+                                    {Math.round(printData.totalAmount * 0.1).toLocaleString()}
+                                </td>
+                            </tr>
+                            <tr style={{ background: '#f9f9f9' }}>
+                                <td colSpan={2} style={{ textAlign: 'center', fontWeight: 800, fontSize: '1.2rem', padding: '15px' }}>합 계 금 액 (GRAND TOTAL)</td>
+                                <td colSpan={4} style={{ textAlign: 'right', fontWeight: 900, fontSize: '1.3rem', padding: '15px' }}>
+                                    {currencySymbol(printData.currency)} {(printData.totalAmount + Math.round(printData.totalAmount * 0.1)).toLocaleString()}
+                                    <span style={{ fontSize: '0.8rem', marginLeft: '10px', fontWeight: 400 }}>(VAT 포함)</span>
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
 
-                    <div style={{ marginTop: '50px', borderTop: '2px solid #000', paddingTop: '20px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                                <p style={{ fontWeight: 800, marginBottom: '10px' }}>BANK INFORMATION:</p>
-                                {printData.currency === 'KRW' ? (
-                                    <p style={{ fontSize: '0.9rem' }}>{company.bank}</p>
-                                ) : (
-                                    <>
-                                        <p style={{ fontSize: '0.9rem' }}>{company.bankForeign1}</p>
-                                        <p style={{ fontSize: '0.9rem' }}>{company.bankForeign2}</p>
-                                    </>
-                                )}
-                            </div>
-                            <div style={{ textAlign: 'center', position: 'relative', width: '400px', paddingTop: '20px' }}>
-                                <div style={{ marginBottom: '40px' }}>
-                                    <span style={{ fontSize: '1.3rem', fontWeight: 900, borderBottom: '2px solid #000', paddingBottom: '5px' }}>위 금액을 정히 영수(청구)함</span>
+                    {/* Footer Boxes */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
+                            <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '10px' }}>[입금계좌 안내]</p>
+                            <p style={{ fontSize: '1.1rem', fontWeight: 800 }}>{company.bank || '-'}</p>
+                            {printData.currency !== 'KRW' && (
+                                <div style={{ marginTop: '10px', fontSize: '0.9rem' }}>
+                                    <p>{company.bankForeign1}</p>
+                                    <p>{company.bankForeign2}</p>
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '10px' }}>
-                                    <p style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '5px' }}>{new Date().toLocaleDateString()}</p>
-                                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '5px' }}>{company.name}</div>
-                                    <div style={{ fontSize: '1.1rem', fontWeight: 700, position: 'relative' }}>
-                                        대표이사 {company.ceo} <span style={{ marginLeft: '10px' }}>(인)</span>
-                                        {company.stampUrl && (
-                                            <img
-                                                src={company.stampUrl}
-                                                style={{
-                                                    position: 'absolute',
-                                                    top: '-40px',
-                                                    right: '-20px',
-                                                    width: '120px',
-                                                    opacity: 0.9,
-                                                    zIndex: 10
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
-                        <div style={{ marginTop: '40px', textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>Thank you for your business!</p>
+                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '1px' }}>위 금액을 정히 영수(청구)함.</h3>
                         </div>
+                    </div>
+
+                    <div style={{ marginTop: '30px', textAlign: 'center', fontSize: '0.8rem', color: '#888' }}>
+                        본 명세표는 인터넷으로 발행되었습니다. / 문의: {company.email}
                     </div>
                 </div>
             </div>

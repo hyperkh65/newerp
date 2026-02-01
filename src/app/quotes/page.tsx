@@ -497,7 +497,12 @@ export default function QuotesPage() {
                     <button onClick={() => setView('list')} style={{ background: '#4a5568', color: 'white', padding: '12px 25px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
                         <ArrowLeft size={18} /> Exit Print Mode
                     </button>
-                    <button onClick={() => window.print()} style={{ background: 'var(--accent-gradient)', color: 'white', padding: '12px 35px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, boxShadow: '0 4px 15px rgba(0,112,243,0.3)' }}>
+                    <button onClick={() => {
+                        const originalTitle = document.title;
+                        document.title = `${printData.date || new Date().toISOString().split('T')[0]}_견적서_${printData.no}`;
+                        window.print();
+                        document.title = originalTitle;
+                    }} style={{ background: 'var(--accent-gradient)', color: 'white', padding: '12px 35px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, boxShadow: '0 4px 15px rgba(0,112,243,0.3)' }}>
                         <Printer size={18} /> Print Document
                     </button>
                 </div>
