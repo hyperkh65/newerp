@@ -397,7 +397,7 @@ export default function AccountingPage() {
                         tr { page-break-inside: avoid; page-break-after: auto; }
                         thead { display: table-header-group; }
                         tfoot { display: table-footer-group; }                        
-                        @page { size: auto; margin: 15mm; }
+                        @page { size: auto; margin: 10mm; }
                     }
                     .dn-table th { background: #f0f0f0 !important; border: 1px solid #333; padding: 10px; font-size: 13px; text-align: center; font-weight: 700; -webkit-print-color-adjust: exact; }
                     .dn-table td { border: 1px solid #333; padding: 10px; font-size: 13px; }
@@ -423,7 +423,7 @@ export default function AccountingPage() {
                     </button>
                 </div>
 
-                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                <div style={{ width: '100%', margin: '0 auto' }}>
                     {/* Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', marginTop: '20px', position: 'relative' }}>
                         {company.logoUrl && (
@@ -458,7 +458,7 @@ export default function AccountingPage() {
                         </div>
                         <div className="box-right">
                             <p className="info-label">공급자 (SELLER)</p>
-                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0' }}>{company.name}</h2>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0', whiteSpace: 'nowrap' }}>{company.name}</h2>
                             <div style={{ fontSize: '1rem', lineHeight: '1.8' }}>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>등록번호:</span> {company.bizNo}</p>
                                 <p>

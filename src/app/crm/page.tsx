@@ -322,7 +322,7 @@ export default function SalesManagementPage() {
                         tr { page-break-inside: avoid; page-break-after: auto; }
                         thead { display: table-header-group; }
                         tfoot { display: table-footer-group; }                        
-                        @page { size: auto; margin: 15mm; }
+                        @page { size: auto; margin: 10mm; }
                     }
                     .statement-table th { background: #f8fafc !important; color: #1e293b !important; border: 1px solid #cbd5e1; font-weight: 700; font-size: 11px; height: 35px; }
                     .statement-table td { border: 1px solid #cbd5e1; padding: 6px 8px; font-size: 11px; }
@@ -330,7 +330,7 @@ export default function SalesManagementPage() {
                     .info-box { padding: 12px; border: 1px solid #cbd5e1; }
                 `}</style>
 
-                <div style={{ padding: '30px 40px' }}>
+                <div style={{ padding: '20px 0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', position: 'relative' }}>
                         {company.logoUrl && (
                             <img src={company.logoUrl} alt="Logo" style={{ height: '70px', maxWidth: '180px', objectFit: 'contain' }} />
@@ -354,7 +354,7 @@ export default function SalesManagementPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
                                     <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px' }}>공급자 (SELLER)</p>
-                                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 5px 0' }}>{company.name}</h2>
+                                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 5px 0', whiteSpace: 'nowrap' }}>{company.name}</h2>
                                     <div style={{ fontSize: '0.8rem', lineHeight: '1.5' }}>
                                         <p>등록번호: {company.bizNo}</p>
                                         <p>대표자: {company.ceo} (인)</p>

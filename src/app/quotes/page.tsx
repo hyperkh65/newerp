@@ -365,14 +365,14 @@ export default function QuotesPage() {
                         .attach-item { margin-bottom: 40px; break-inside: avoid; }
                         .attach-img { max-width: 100%; height: auto; max-height: 480px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: block; }
                         
-                        @page { size: auto; margin: 15mm; }
+                        @page { size: auto; margin: 10mm; }
                     }
                     .pi-table th { background: #1a202c !important; color: white !important; -webkit-print-color-adjust: exact; font-weight: 500; font-size: 11px; }
                     .pi-table td { font-size: 11px; border: 0.5px solid #e2e8f0; }
                     .pi-total-row { background: #f8fafc !important; -webkit-print-color-adjust: exact; }
                 `}</style>
 
-                <div style={{ padding: '50px 40px' }}>
+                <div style={{ padding: '20px 0' }}>
                     {/* Header Top Section */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative' }}>
                         {company.logoUrl && (
@@ -388,8 +388,8 @@ export default function QuotesPage() {
                                 <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700, color: '#1a202c' }}>{printData.date}</span></p>
                             </div>
                         </div>
-                        <div style={{ textAlign: 'right', position: 'relative' }}>
-                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c' }}>{company.name}</h2>
+                        <div style={{ textAlign: 'right', minWidth: 'min-content', flexShrink: 0 }}>
+                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c', whiteSpace: 'nowrap' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.5', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>

@@ -400,14 +400,14 @@ export default function PurchaseOrdersPage() {
                         .attach-item { margin-bottom: 40px; break-inside: avoid; }
                         .attach-img { max-width: 100%; height: auto; max-height: 480px; border: 1px solid #dcdde1; border-radius: 8px; margin-bottom: 15px; display: block; }
 
-                        @page { size: auto; margin: 15mm; }
+                        @page { size: auto; margin: 10mm; }
                     }
                     .pi-table th { background: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; font-weight: 500; font-size: 11px; text-align: center; }
                     .pi-table td { font-size: 11px; border: 0.5px solid #dcdde1; }
                     .pi-total-row { background: #f5f6fa !important; -webkit-print-color-adjust: exact; }
                 `}</style>
 
-                <div style={{ padding: '50px 40px' }}>
+                <div style={{ padding: '20px 0' }}>
                     {/* Header Top Section */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative' }}>
                         {company.logoUrl && (
@@ -421,8 +421,8 @@ export default function PurchaseOrdersPage() {
                                 <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700 }}>{printData.date}</span></p>
                             </div>
                         </div>
-                        <div style={{ textAlign: 'right', position: 'relative' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 5px 0' }}>{company.name}</h2>
+                        <div style={{ textAlign: 'right', minWidth: 'min-content', flexShrink: 0 }}>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 5px 0', whiteSpace: 'nowrap' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.85rem', color: '#353b48', lineHeight: '1.4', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
