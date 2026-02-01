@@ -15,11 +15,17 @@ export default function SettingsPage() {
     const handleSave = async () => {
         if (settings) {
             try {
-                await saveCompanySettingsNotion(settings);
-                setSaved(true);
-                setTimeout(() => setSaved(false), 2000);
-            } catch (e) {
-                alert('설정 저장 중 오류가 발생했습니다.');
+                const res = await saveCompanySettingsNotion(settings);
+                if (res && (res.error || res.status >= 400)) {
+                    const errorMsg = res.message || res.error || '알 수 없는 노션 오류';
+                    alert(`노션 저장 실패: ${errorMsg}\n(DB 속성 이름이나 API 키를 확인해주세요.)`);
+                } else {
+                    setSaved(true);
+                    setTimeout(() => setSaved(false), 2000);
+                }
+            } catch (e: any) {
+                console.error('Settings handleSave Error:', e);
+                alert(`설정 저장 중 시스템 오류가 발생했습니다: ${e.message}\n(브라우저 콘솔 로그를 확인해주세요.)`);
             }
         }
     };

@@ -74,31 +74,48 @@ export const fetchCompanySettings = async (): Promise<CompanySettings> => {
 export const saveCompanySettingsNotion = async (settings: CompanySettings) => {
     saveSettings(settings); // Local caching first
     try {
+        console.log('Fetching existing settings to update or create...');
         const res = await notionQuery(DB_SETTINGS);
-        const props = {
-            name: TITLE(settings.name),
-            ceo: RT(settings.ceo),
+
+        // Notion DB 속성 이름이 정확히 일치해야 합니다.
+        // 노션 DB의 속성명이 아래 문자열과 완전히 동일한지 확인이 필요합니다.
+        const props: any = {
+            'name': TITLE(settings.name),
+            'ceo': RT(settings.ceo),
             'business no': RT(settings.bizNo),
-            address: RT(settings.address),
-            tel: RT(settings.tel),
-            fax: RT(settings.fax),
-            email: EMAIL(settings.email),
+            'address': RT(settings.address),
+            'tel': RT(settings.tel),
+            'fax': RT(settings.fax),
+            'email': EMAIL(settings.email),
             'account domestic': RT(settings.bank),
             'account overseas 1': RT(settings.bankForeign1),
             'account overseas 2': RT(settings.bankForeign2),
-            logo: { url: settings.logoUrl || null },
-            stamp: { url: settings.stampUrl || null },
             'category 1': RT(settings.bizType),
             'category 2': RT(settings.bizItem)
         };
 
-        if (res.results.length > 0) {
-            await notionUpdate(res.results[0].id, props);
-        } else {
-            await notionCreate(DB_SETTINGS, props);
+        // 로고와 직인이 URL 형태일 때만 추가 (null이나 빈 문자열이면 제외하여 에러 방지)
+        if (settings.logoUrl) {
+            props['logo'] = { url: settings.logoUrl };
         }
-    } catch (e) {
-        console.error('Failed to save settings to Notion:', e);
+        if (settings.stampUrl) {
+            props['stamp'] = { url: settings.stampUrl };
+        }
+
+        if (res.results && res.results.length > 0) {
+            const pageId = res.results[0].id;
+            console.log('Updating existing settings page:', pageId);
+            const updateRes = await notionUpdate(pageId, props);
+            if (updateRes.error) throw new Error(updateRes.message || '노션 페이지 업데이트 실패');
+            return updateRes;
+        } else {
+            console.log('Creating new settings page...');
+            const createRes = await notionCreate(DB_SETTINGS, props);
+            if (createRes.error) throw new Error(createRes.message || '노션 페이지 생성 실패');
+            return createRes;
+        }
+    } catch (e: any) {
+        console.error('saveCompanySettingsNotion Error Detail:', e);
         throw e;
     }
 };
