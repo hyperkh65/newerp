@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import {
     notionQuery, notionCreate, notionUpdate, notionDelete,
+    isWithinCurrentMonth, validatePeriod,
     DB_INVOICES, DB_INVOICE_DETAIL, DB_CLIENTS, DB_PRODUCTS,
     RT, TITLE, num, dateISO, select, FILES, uploadFile
 } from '@/lib/notion';
@@ -245,6 +246,7 @@ export default function AccountingPage() {
 
     const handleUpdateInvoice = async () => {
         if (!editingInvoice) return;
+        if (!validatePeriod(editingInvoice.issueDate)) return;
         try {
             setLoading(true);
             const total = editingInvoice.items?.reduce((acc, it) => acc + (it.qty * it.unitPrice), 0) || editingInvoice.totalAmount;
@@ -635,6 +637,7 @@ export default function AccountingPage() {
                                         <td style={{ padding: '1.2rem 1rem' }}>
                                             <button
                                                 onClick={async () => {
+                                                    if (!validatePeriod(inv.issueDate)) return;
                                                     const nextStatus = inv.status === '완료' ? '대기' : '완료';
                                                     await notionUpdate(inv.id, { Status: select(nextStatus) });
                                                     fetchData();

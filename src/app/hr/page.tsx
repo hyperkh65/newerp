@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Search, Plus, Save, Trash2, X, Upload, User, Edit2, Calendar } from 'lucide-react';
 import Modal from '@/components/Modal';
-import { notionQuery, notionCreate, notionUpdate, notionDelete, DB_HR, RT, TITLE, FILES, uploadFile, select, email, dateISO } from '@/lib/notion';
+import {
+    notionQuery, notionCreate, notionUpdate, notionDelete,
+    isWithinCurrentMonth, validatePeriod,
+    DB_HR, RT, TITLE, FILES, uploadFile, select, email, dateISO
+} from '@/lib/notion';
 
 export default function HRPage() {
     const [employees, setEmployees] = useState<any[]>([]);
@@ -62,8 +66,12 @@ export default function HRPage() {
                 'EmployeeID': RT(form.employeeId)      // 텍스트(≡)
             };
 
-            if (selectedEmp) await notionUpdate(selectedEmp.id, props);
-            else await notionCreate(DB_HR, props);
+            if (selectedEmp) {
+                if (!validatePeriod(form.joinDate)) return;
+                await notionUpdate(selectedEmp.id, props);
+            } else {
+                await notionCreate(DB_HR, props);
+            }
 
             setIsModalOpen(false);
             fetchEmployees();
@@ -120,7 +128,11 @@ export default function HRPage() {
                                 <p style={{ fontSize: '0.85rem', color: '#0070f3', marginBottom: '1rem' }}>{p.Position?.select?.name || '직위 미정'} ({p.Department?.select?.name || '부서 미정'})</p>
                                 <div style={{ display: 'flex', gap: '8px', marginTop: 'auto' }}>
                                     <button onClick={() => openModal(emp)} style={{ padding: '8px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white' }}><Edit2 size={16} /></button>
-                                    <button onClick={async () => { if (confirm('삭제하시겠습니까?')) { await notionDelete(emp.id); fetchEmployees(); } }} style={{ padding: '8px', borderRadius: '8px', background: 'rgba(255,0,0,0.1)', border: 'none', color: '#ff4d4d' }}><Trash2 size={16} /></button>
+                                    <button onClick={async () => {
+                                        const joinDate = p.JoinDate?.date?.start || '';
+                                        if (!validatePeriod(joinDate)) return;
+                                        if (confirm('삭제하시겠습니까?')) { await notionDelete(emp.id); fetchEmployees(); }
+                                    }} style={{ padding: '8px', borderRadius: '8px', background: 'rgba(255,0,0,0.1)', border: 'none', color: '#ff4d4d' }}><Trash2 size={16} /></button>
                                 </div>
                             </div>
                         );

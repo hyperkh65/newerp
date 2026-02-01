@@ -4,7 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { Quote, Plus, Search, FileText, Trash2, Printer, ChevronRight, Calculator, User, Building, MapPin, Mail, Phone, Box, ArrowLeft, Download, CheckCircle, Clock } from 'lucide-react';
 import Modal from '@/components/Modal';
 import ProductPicker from '@/components/ProductPicker';
-import { notionQuery, notionCreate, notionUpdate, notionDelete, DB_QUOTES, DB_CLIENTS, DB_PRODUCTS, RT, TITLE, num, dateISO, FILES, uploadFile } from '@/lib/notion';
+import {
+    notionQuery, notionCreate, notionUpdate, notionDelete,
+    isWithinCurrentMonth, validatePeriod,
+    DB_QUOTES, DB_CLIENTS, DB_PRODUCTS, RT, TITLE, num, dateISO, FILES, uploadFile
+} from '@/lib/notion';
 import { getSettings } from '@/lib/settings';
 
 interface QuoteItem {
@@ -206,6 +210,14 @@ export default function QuotesPage() {
     });
 
     const handleSave = async () => {
+        if (!form.client) return alert('거래처를 선택하세요.');
+        if (form.items.length === 0) return alert('최소 1개의 항목이 필요합니다.');
+
+        // 당월 체크 (수정인 경우)
+        if (form.items.some(it => it.id && typeof it.id === 'string')) {
+            if (!validatePeriod(form.date)) return;
+        }
+
         try {
             if (editMode && currentQuoteNo) {
                 const toDelete = quotes.find(q => q.no === currentQuoteNo)?.items.map(it => it.id.toString()) || [];
@@ -891,7 +903,12 @@ export default function QuotesPage() {
                                             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                                                 <button onClick={() => handlePrint(q)} title="Print Document" style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', color: 'white', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'; }}><Printer size={18} /></button>
                                                 <button onClick={() => handleEdit(q)} title="Edit Details" style={{ padding: '10px', background: 'rgba(0,112,243,0.1)', border: '1px solid rgba(0,112,243,0.1)', borderRadius: '12px', color: '#0070f3', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,112,243,0.2)'; e.currentTarget.style.borderColor = 'rgba(0,112,243,0.3)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,112,243,0.1)'; e.currentTarget.style.borderColor = 'rgba(0,112,243,0.1)'; }}><ChevronRight size={18} /></button>
-                                                <button onClick={async () => { if (confirm('Are you sure to delete this quotation?')) { for (const it of q.items) await notionDelete(it.id.toString()); fetchInitialData(); } }} title="Delete" style={{ padding: '10px', background: 'rgba(255,77,79,0.1)', border: '1px solid rgba(255,77,79,0.1)', borderRadius: '12px', color: '#ff4d4f', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,77,79,0.2)'; e.currentTarget.style.borderColor = 'rgba(255,77,79,0.3)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,77,79,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,77,79,0.1)'; }}><Trash2 size={18} /></button>
+                                                <button onClick={async () => {
+                                                    if (!validatePeriod(q.date)) return;
+                                                    if (confirm('Are you sure to delete this quotation?')) { for (const it of q.items) await notionDelete(it.id.toString()); fetchInitialData(); }
+                                                }} title="Delete" style={{ padding: '10px', background: 'rgba(255,77,79,0.1)', border: '1px solid rgba(255,77,79,0.1)', borderRadius: '12px', color: '#ff4d4f', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,77,79,0.2)'; e.currentTarget.style.borderColor = 'rgba(255,77,79,0.3)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,77,79,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,77,79,0.1)'; }}>
+                                                    <Trash2 size={18} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

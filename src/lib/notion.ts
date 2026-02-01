@@ -66,6 +66,26 @@ export const notionCreate = (db: string, properties: any) => api('/create', { db
 export const notionUpdate = (pageId: string, properties: any) => api('/update', { pageId, properties });
 export const notionDelete = (pageId: string) => api('/delete', { pageId });
 
+/* --------- Date Check Helper --------- */
+export function isWithinCurrentMonth(dateStr: string): boolean {
+    if (!dateStr) return true;
+    try {
+        const now = new Date();
+        const target = new Date(dateStr);
+        return now.getFullYear() === target.getFullYear() && now.getMonth() === target.getMonth();
+    } catch (e) {
+        return true;
+    }
+}
+
+export function validatePeriod(dateStr: string): boolean {
+    if (!isWithinCurrentMonth(dateStr)) {
+        alert('데이터 수정 및 삭제는 데이터가 생성된 당월(속한 달) 내에서만 가능합니다.\n(현재 달이 아니므로 작업을 수행할 수 없습니다.)');
+        return false;
+    }
+    return true;
+}
+
 /* --------- Upload Helper --------- */
 export async function uploadFile(file: File): Promise<{ url: string; name: string }> {
     const formData = new FormData();

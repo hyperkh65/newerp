@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import {
     notionQuery, notionCreate, notionDelete, notionUpdate,
+    isWithinCurrentMonth, validatePeriod,
     DB_IMPORTS_MASTER, DB_IMPORTS_DETAIL, DB_PRODUCTS, DB_CLIENTS,
     RT, num, dateISO, select, TITLE, FILES, uploadFile, MS
 } from '@/lib/notion';
@@ -131,6 +132,12 @@ export default function ImportsPage() {
 
     const [unipassData, setUnipassData] = useState<any>(null);
     const [unipassLoading, setUnipassLoading] = useState(false);
+
+    // 당월 수정 제한 여부 계산
+    const isPastMonth = useMemo(() => {
+        if (!form.id) return false;
+        return !isWithinCurrentMonth(form.date);
+    }, [form.id, form.date]);
 
     // 실시간 환율 가이드 데이터
     const [realtimeExRates, setRealtimeExRates] = useState({ usd: 1385, cny: 191.5 });
@@ -321,6 +328,9 @@ export default function ImportsPage() {
             return alert('기본 정보와 품목을 입력하세요.');
         }
 
+        // 당월 체크
+        const isPastMonth = form.id && !isWithinCurrentMonth(form.date);
+
         try {
             setLoading(true);
             // 1. Master Save
@@ -396,11 +406,18 @@ export default function ImportsPage() {
                     FinalPreUnitCost: num(it.finalPreUnitCost),
                     FinalPostUnitCost: num(it.finalPostUnitCost),
                     FinalTotalCost: num(it.finalTotalCost),
-                    Currency: select(it.currency)
+                    Currency: select(it.currency),
+                    // 지급환율은 상세에도 저장 (itPaymentRate)
+                    ITPaymentRate: num(it.itPaymentRate || 0),
+                    ITDutyRate: num(it.itDutyRate || 0)
                 });
             }
 
-            alert('수입 내역이 성공적으로 저장되었습니다.');
+            if (isPastMonth) {
+                alert('과거 데이터입니다. 사후단가(지급 환율) 정보만 업데이트 되었습니다.');
+            } else {
+                alert('수입 내역이 성공적으로 저장되었습니다.');
+            }
             setView('list');
             fetchInitialData();
             // Reset
@@ -605,7 +622,7 @@ export default function ImportsPage() {
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Incoterms</label>
-                                <select value={form.incoterms} onChange={e => setForm({ ...form, incoterms: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}>
+                                <select disabled={isPastMonth} value={form.incoterms} onChange={e => setForm({ ...form, incoterms: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}>
                                     <option value="FOB">FOB</option>
                                     <option value="EXW">EXW</option>
                                     <option value="CIF">CIF</option>
@@ -615,11 +632,11 @@ export default function ImportsPage() {
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>통관 환율 (KRW)</label>
-                                <input type="number" value={form.dutyExchangeRate} onChange={e => setForm({ ...form, dutyExchangeRate: Number(e.target.value) })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid #0070f3', borderRadius: '10px', color: 'white' }} />
+                                <input disabled={isPastMonth} type="number" value={form.dutyExchangeRate} onChange={e => setForm({ ...form, dutyExchangeRate: Number(e.target.value) })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid #0070f3', borderRadius: '10px', color: 'white' }} />
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>수출업체</label>
-                                <select value={form.exporter} onChange={e => setForm({ ...form, exporter: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}>
+                                <select disabled={isPastMonth} value={form.exporter} onChange={e => setForm({ ...form, exporter: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}>
                                     <option value="">-- 업체 선택 --</option>
                                     {clients.map(c => <option key={c.id} value={c.properties.ClientName.title[0].plain_text}>{c.properties.ClientName.title[0].plain_text}</option>)}
                                 </select>
@@ -627,15 +644,15 @@ export default function ImportsPage() {
 
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>MBL No.</label>
-                                <input value={form.blNoMaster} onChange={e => setForm({ ...form, blNoMaster: e.target.value })} placeholder="MBL#" style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }} />
+                                <input disabled={isPastMonth} value={form.blNoMaster} onChange={e => setForm({ ...form, blNoMaster: e.target.value })} placeholder="MBL#" style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }} />
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>HBL No.</label>
-                                <input value={form.blNoHouse} onChange={e => setForm({ ...form, blNoHouse: e.target.value })} placeholder="HBL#" style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }} />
+                                <input disabled={isPastMonth} value={form.blNoHouse} onChange={e => setForm({ ...form, blNoHouse: e.target.value })} placeholder="HBL#" style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }} />
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>운송 수단</label>
-                                <select value={form.transportType} onChange={e => setForm({ ...form, transportType: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}>
+                                <select disabled={isPastMonth} value={form.transportType} onChange={e => setForm({ ...form, transportType: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }}>
                                     <option value="SEA">해상 (SEA)</option>
                                     <option value="AIR">항공 (AIR)</option>
                                     <option value="COURIER">특송 (COURIER)</option>
@@ -643,17 +660,17 @@ export default function ImportsPage() {
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>출고/수입 일자</label>
-                                <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', colorScheme: 'dark' }} />
+                                <input disabled={isPastMonth} type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', colorScheme: 'dark' }} />
                             </div>
 
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>Vessel/Flight</label>
-                                <input value={form.vesselVoyage} onChange={e => setForm({ ...form, vesselVoyage: e.target.value })} placeholder="선명/항공편" style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }} />
+                                <input disabled={isPastMonth} value={form.vesselVoyage} onChange={e => setForm({ ...form, vesselVoyage: e.target.value })} placeholder="선명/항공편" style={{ width: '100%', padding: '0.7rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white' }} />
                             </div>
                             <div>
                                 <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>해상운임 환율 (USD/KRW)</label>
                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    <input type="number" value={form.freightExchangeRate} onChange={e => setForm({ ...form, freightExchangeRate: Number(e.target.value) })} style={{ flex: 1, padding: '0.7rem', background: 'rgba(0,112,243,0.05)', border: '1px solid #0070f3', borderRadius: '10px', color: 'white' }} />
+                                    <input disabled={isPastMonth} type="number" value={form.freightExchangeRate} onChange={e => setForm({ ...form, freightExchangeRate: Number(e.target.value) })} style={{ flex: 1, padding: '0.7rem', background: 'rgba(0,112,243,0.05)', border: '1px solid #0070f3', borderRadius: '10px', color: 'white' }} />
                                     <TrendingUp size={16} style={{ color: '#0070f3' }} />
                                 </div>
                                 <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', marginTop: '4px' }}>* USD 운임을 원화로 계산할 때 사용</p>
@@ -691,14 +708,15 @@ export default function ImportsPage() {
                                     <div key={fee.key}>
                                         <label style={{ display: 'block', fontSize: '0.7rem', color: fee.color, marginBottom: '8px' }}>{fee.label}</label>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <button onClick={() => setForm({ ...form, [fee.key]: Math.max(0, Number(form[fee.key as keyof ImportMaster]) - fee.step) })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}>-</button>
+                                            <button disabled={isPastMonth} onClick={() => setForm({ ...form, [fee.key]: Math.max(0, Number(form[fee.key as keyof ImportMaster]) - fee.step) })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '8px', borderRadius: '4px', cursor: 'pointer', opacity: isPastMonth ? 0.3 : 1 }}>-</button>
                                             <input
+                                                disabled={isPastMonth}
                                                 type="number"
                                                 value={form[fee.key as keyof ImportMaster] as number}
                                                 onChange={e => setForm({ ...form, [fee.key]: Number(e.target.value) })}
                                                 style={{ flex: 1, padding: '0.6rem', textAlign: 'center', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'white', fontSize: '0.85rem' }}
                                             />
-                                            <button onClick={() => setForm({ ...form, [fee.key]: Number(form[fee.key as keyof ImportMaster]) + fee.step })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '8px', borderRadius: '4px', cursor: 'pointer' }}>+</button>
+                                            <button disabled={isPastMonth} onClick={() => setForm({ ...form, [fee.key]: Number(form[fee.key as keyof ImportMaster]) + fee.step })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '8px', borderRadius: '4px', cursor: 'pointer', opacity: isPastMonth ? 0.3 : 1 }}>+</button>
                                         </div>
                                     </div>
                                 ))}
@@ -720,9 +738,9 @@ export default function ImportsPage() {
                                         <span style={{ fontSize: '0.7rem', color: form.files[type as keyof ImportMaster['files']] ? '#00ff88' : 'rgba(255,255,255,0.3)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                             {form.files[type as keyof ImportMaster['files']] ? form.files[type as keyof ImportMaster['files']]?.name : '파일 없음'}
                                         </span>
-                                        <label style={{ cursor: 'pointer' }}>
+                                        <label style={{ cursor: isPastMonth ? 'not-allowed' : 'pointer', opacity: isPastMonth ? 0.3 : 1 }}>
                                             <FileUp size={16} />
-                                            <input type="file" hidden onChange={e => handleFileUpload(e, type as any)} />
+                                            <input disabled={isPastMonth} type="file" hidden onChange={e => handleFileUpload(e, type as any)} />
                                         </label>
                                     </div>
                                 </div>
@@ -736,7 +754,7 @@ export default function ImportsPage() {
                             <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <Package size={18} /> 수입 품목 상세 (Import Items)
                             </h3>
-                            <button onClick={() => setIsProductPickerOpen(true)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 15px', borderRadius: '8px', color: 'white', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <button disabled={isPastMonth} onClick={() => setIsProductPickerOpen(true)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 15px', borderRadius: '8px', color: 'white', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px', opacity: isPastMonth ? 0.3 : 1, cursor: isPastMonth ? 'not-allowed' : 'pointer' }}>
                                 <Plus size={14} /> 품목 추가
                             </button>
                         </div>
@@ -763,6 +781,7 @@ export default function ImportsPage() {
                                             </td>
                                             <td>
                                                 <input
+                                                    disabled={isPastMonth}
                                                     type="text"
                                                     value={it.qty}
                                                     onChange={e => {
@@ -776,13 +795,14 @@ export default function ImportsPage() {
                                             </td>
                                             <td>
                                                 <div style={{ display: 'flex', gap: '4px' }}>
-                                                    <select value={it.currency} onChange={e => updateItem(idx, { currency: e.target.value })} style={{ background: 'rgba(0,0,0,0.2)', border: 'none', color: 'white', fontSize: '0.7rem', borderRadius: '4px' }}>
+                                                    <select disabled={isPastMonth} value={it.currency} onChange={e => updateItem(idx, { currency: e.target.value })} style={{ background: 'rgba(0,0,0,0.2)', border: 'none', color: 'white', fontSize: '0.7rem', borderRadius: '4px' }}>
                                                         <option value="USD">USD</option>
                                                         <option value="RMB">RMB</option>
                                                         <option value="EUR">EUR</option>
                                                         <option value="JPY">JPY</option>
                                                     </select>
                                                     <input
+                                                        disabled={isPastMonth}
                                                         type="text"
                                                         value={it.unitPrice}
                                                         onChange={e => {
@@ -796,10 +816,11 @@ export default function ImportsPage() {
                                                 </div>
                                             </td>
                                             <td>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                                                    <button onClick={() => updateItem(idx, { cbm: Math.max(0, Number((Number(it.cbm) - 0.01).toFixed(3))) })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', cursor: 'pointer', color: 'white', padding: '4px' }}>-</button>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', opacity: isPastMonth ? 0.3 : 1 }}>
+                                                    <button disabled={isPastMonth} onClick={() => updateItem(idx, { cbm: Math.max(0, Number((Number(it.cbm) - 0.01).toFixed(3))) })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', cursor: 'pointer', color: 'white', padding: '4px' }}>-</button>
                                                     <div style={{ position: 'relative' }}>
                                                         <input
+                                                            disabled={isPastMonth}
                                                             type="text"
                                                             value={it.cbm}
                                                             onFocus={() => { setCbmCalcIdx(idx); setCbmInput({ l: 0, w: 0, h: 0, pkg: Number(it.qty) || 1 }); }}
@@ -813,11 +834,11 @@ export default function ImportsPage() {
                                                         />
                                                         <Calculator
                                                             size={12}
-                                                            onClick={() => setCbmCalcIdx(cbmCalcIdx === idx ? null : idx)}
-                                                            style={{ position: 'absolute', right: '-15px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: '#00ff88', opacity: 0.6 }}
+                                                            onClick={() => !isPastMonth && setCbmCalcIdx(cbmCalcIdx === idx ? null : idx)}
+                                                            style={{ position: 'absolute', right: '-15px', top: '50%', transform: 'translateY(-50%)', cursor: isPastMonth ? 'not-allowed' : 'pointer', color: '#00ff88', opacity: 0.6 }}
                                                         />
                                                     </div>
-                                                    <button onClick={() => updateItem(idx, { cbm: Number((Number(it.cbm) + 0.01).toFixed(3)) })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', cursor: 'pointer', color: 'white', padding: '4px' }}>+</button>
+                                                    <button disabled={isPastMonth} onClick={() => updateItem(idx, { cbm: Number((Number(it.cbm) + 0.01).toFixed(3)) })} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', cursor: 'pointer', color: 'white', padding: '4px' }}>+</button>
                                                 </div>
                                                 {cbmCalcIdx === idx && (
                                                     <div className="glass" style={{ position: 'absolute', zIndex: 100, padding: '10px', marginTop: '5px', width: '180px', display: 'flex', flexDirection: 'column', gap: '8px', border: '1px solid #00ff88' }}>
@@ -842,6 +863,7 @@ export default function ImportsPage() {
                                             </td>
                                             <td>
                                                 <input
+                                                    disabled={isPastMonth}
                                                     type="text"
                                                     value={it.dutyRate}
                                                     onChange={e => {
@@ -893,7 +915,9 @@ export default function ImportsPage() {
                                                 <div style={{ fontWeight: 600, color: '#0070f3', fontSize: '0.85rem' }}>Post: ₩{it.finalPostUnitCost?.toLocaleString()}</div>
                                             </td>
                                             <td style={{ textAlign: 'center' }}>
-                                                <button onClick={() => setForm({ ...form, items: (form.items || []).filter(i => i.id !== it.id) })} style={{ color: '#ff4d4f', border: 'none', background: 'none' }}><X size={16} /></button>
+                                                {!isPastMonth && (
+                                                    <button onClick={() => setForm({ ...form, items: (form.items || []).filter(i => i.id !== it.id) })} style={{ color: '#ff4d4f', border: 'none', background: 'none', cursor: 'pointer' }}><X size={16} /></button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -1077,6 +1101,7 @@ export default function ImportsPage() {
                             </button>
                             <button
                                 onClick={async () => {
+                                    if (!validatePeriod(selectedImport.date)) return;
                                     if (confirm('이 수입 내역과 모든 상세 항목을 삭제하시겠습니까?')) {
                                         await notionDelete(selectedImport.id);
                                         // Detail delete requires query by ImportNo first

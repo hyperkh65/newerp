@@ -5,7 +5,11 @@ import { ShoppingCart, Plus, Search, FileText, Trash2, Printer, ChevronRight, Ca
 import Modal from '@/components/Modal';
 import ProductPicker from '@/components/ProductPicker';
 import QuotePicker from '@/components/QuotePicker';
-import { notionQuery, notionCreate, notionUpdate, notionDelete, DB_PURCHASE_ORDERS, DB_CLIENTS, DB_PRODUCTS, RT, TITLE, num, dateISO, FILES, uploadFile } from '@/lib/notion';
+import {
+    notionQuery, notionCreate, notionUpdate, notionDelete,
+    isWithinCurrentMonth, validatePeriod,
+    DB_PURCHASE_ORDERS, DB_CLIENTS, DB_PRODUCTS, RT, TITLE, num, dateISO, FILES, uploadFile
+} from '@/lib/notion';
 import { getSettings } from '@/lib/settings';
 
 interface POItem {
@@ -209,6 +213,14 @@ export default function PurchaseOrdersPage() {
     };
 
     const handleSave = async () => {
+        if (!form.supplier) return alert('공급처를 선택하세요.');
+        if (form.items.length === 0) return alert('최소 1개의 품목이 필요합니다.');
+
+        // 당월 체크 (수정인 경우)
+        if (editMode && currentPoNo) {
+            if (!validatePeriod(form.date)) return;
+        }
+
         try {
             if (editMode && currentPoNo) {
                 const toDelete = pos.find(p => p.no === currentPoNo)?.items.map(it => it.id.toString()) || [];
@@ -903,7 +915,12 @@ export default function PurchaseOrdersPage() {
                                             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                                                 <button onClick={() => handlePrint(p)} style={{ padding: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', color: 'white', cursor: 'pointer' }}><Printer size={18} /></button>
                                                 <button onClick={() => handleEdit(p)} style={{ padding: '10px', background: 'rgba(230,126,34,0.1)', border: '1px solid rgba(230,126,34,0.1)', borderRadius: '12px', color: '#e67e22', cursor: 'pointer' }}><ChevronRight size={18} /></button>
-                                                <button onClick={async () => { if (confirm('Delete this purchase order?')) { for (const it of p.items) await notionDelete(it.id.toString()); fetchInitialData(); } }} style={{ padding: '10px', background: 'rgba(255,77,79,0.1)', border: '1px solid rgba(255,77,79,0.1)', borderRadius: '12px', color: '#ff4d4f', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                                                <button onClick={async () => {
+                                                    if (!validatePeriod(p.date)) return;
+                                                    if (confirm('Are you sure you want to delete this order?')) { for (const it of p.items) await notionDelete(it.id.toString()); fetchInitialData(); }
+                                                }} title="Delete" style={{ padding: '10px', background: 'rgba(255,77,79,0.1)', border: '1px solid rgba(255,77,79,0.1)', borderRadius: '12px', color: '#ff4d4f', cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,77,79,0.2)'; e.currentTarget.style.borderColor = 'rgba(255,77,79,0.3)'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,77,79,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,77,79,0.1)'; }}>
+                                                    <Trash2 size={18} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

@@ -11,6 +11,7 @@ import ProductPicker from '@/components/ProductPicker';
 import QuotePicker from '@/components/QuotePicker';
 import {
     notionQuery, notionCreate, notionUpdate, notionDelete,
+    isWithinCurrentMonth, validatePeriod,
     DB_SALES, DB_CLIENTS, DB_PRODUCTS,
     RT, TITLE, num, dateISO, select
 } from '@/lib/notion';
@@ -720,7 +721,8 @@ export default function SalesManagementPage() {
                                                     <button onClick={() => handlePrint(s)} title="명세서 인쇄" style={{ padding: '8px', background: 'rgba(0,112,243,0.1)', border: 'none', borderRadius: '8px', color: '#0070f3' }}><Printer size={16} /></button>
                                                     <button
                                                         onClick={async () => {
-                                                            if (confirm('이 등록번호(' + s.code + ')의 모든 매출 필드를 삭제하시겠습니까?')) {
+                                                            if (!validatePeriod(s.date)) return;
+                                                            if (confirm('정말로 이 매출 데이터를 삭제하시겠습니까?')) {
                                                                 for (const item of s.items) await notionDelete(item.id as string);
                                                                 fetchInitialData();
                                                             }
