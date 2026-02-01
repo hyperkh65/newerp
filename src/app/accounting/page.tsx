@@ -448,20 +448,21 @@ export default function AccountingPage() {
                                     </>
                                 )}
                             </div>
-                            <div style={{ textAlign: 'right', position: 'relative', width: '300px' }}>
-                                <p style={{ fontWeight: 800, marginBottom: '60px' }}>AUTHORIZED SIGNATURE</p>
-                                <div style={{ borderBottom: '1px solid #000', marginBottom: '5px' }}></div>
-                                <p style={{ fontSize: '0.8rem' }}>{company.name}</p>
+                            <div style={{ textAlign: 'right', position: 'relative', width: '350px' }}>
+                                <p style={{ fontWeight: 800, marginBottom: '80px' }}>AUTHORIZED SIGNATURE</p>
+                                <div style={{ borderBottom: '1px solid #000', marginBottom: '10px' }}></div>
+                                <p style={{ fontSize: '1rem', fontWeight: 700 }}>{company.name}</p>
                                 {company.stampUrl && (
                                     <img
                                         src={company.stampUrl}
-                                        width="320"
                                         style={{
                                             position: 'absolute',
                                             top: '0',
                                             right: '0',
+                                            width: '320px',
                                             opacity: 0.85,
-                                            transform: 'translate(20%, -30%)'
+                                            transform: 'translate(10%, 10%) rotate(-5deg)',
+                                            zIndex: 10
                                         }}
                                     />
                                 )}
