@@ -375,12 +375,19 @@ export default function AccountingPage() {
             <div style={{ background: 'white', color: 'black', minHeight: '100vh', padding: '40px' }} id="print-area">
                 <style>{`
                     @media print { 
-                        /* Hide everything else */
+                        /* Hide everything by default */
                         body * { visibility: hidden !important; }
-                        aside, header, nav, .no-print, .sidebar { display: none !important; }
+                        aside, header, nav, .sidebar, [role="complementary"] { display: none !important; }
                         
                         /* Show only the print area */
                         #print-area, #print-area * { visibility: visible !important; } 
+                        
+                        /* EXPLICITLY HIDE no-print elements even inside print-area */
+                        .no-print, .no-print * { 
+                            visibility: hidden !important; 
+                            display: none !important; 
+                        }
+
                         #print-area { 
                             position: fixed !important; 
                             left: 0 !important; 
@@ -390,6 +397,7 @@ export default function AccountingPage() {
                             padding: 0 !important; 
                             margin: 0 !important;
                             background: white !important;
+                            z-index: 9999 !important;
                         } 
                         
                         @page { size: auto; margin: 15mm; }
@@ -398,7 +406,7 @@ export default function AccountingPage() {
                     .dn-table td { border: 1px solid #333; padding: 10px; font-size: 13px; }
                     .box-container { display: grid; grid-template-columns: 1fr 1fr; border: 2px solid #333; margin-bottom: 30px; }
                     .box-left { border-right: 1px solid #333; padding: 20px; position: relative; }
-                    .box-right { padding: 20px; position: relative; }
+                    .box-right { padding: 20px; position: relative; min-height: 180px; }
                     .info-label { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
                 `}</style>
                 <div className="no-print" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
@@ -446,26 +454,26 @@ export default function AccountingPage() {
                                 <p style={{ position: 'relative', zIndex: 2 }}>
                                     <span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>대표자:</span> {company.ceo}
                                     <span style={{ marginLeft: '10px' }}>(인)</span>
-                                    {company.stampUrl && (
-                                        <img
-                                            src={company.stampUrl}
-                                            alt="Stamp"
-                                            style={{
-                                                position: 'absolute',
-                                                top: '-15px',
-                                                left: '120px',
-                                                width: '75px',
-                                                height: '75px',
-                                                opacity: 0.85,
-                                                zIndex: 1,
-                                                pointerEvents: 'none'
-                                            }}
-                                        />
-                                    )}
                                 </p>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>주소:</span> {company.address}</p>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>업태:</span> {company.bizType} <span style={{ margin: '0 10px' }}>/</span> <span style={{ fontWeight: 600 }}>종목:</span> {company.bizItem}</p>
                             </div>
+                            {company.stampUrl && (
+                                <img
+                                    src={company.stampUrl}
+                                    alt="Stamp"
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: '10px',
+                                        right: '10px',
+                                        width: '130px',
+                                        height: '130px',
+                                        opacity: 0.85,
+                                        zIndex: 1,
+                                        pointerEvents: 'none'
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
 

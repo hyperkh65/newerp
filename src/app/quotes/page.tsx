@@ -321,12 +321,19 @@ export default function QuotesPage() {
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
                     @media print { 
-                        /* Hide everything else */
+                        /* Hide everything by default */
                         body * { visibility: hidden !important; }
-                        aside, header, nav, .no-print, .sidebar { display: none !important; }
+                        aside, header, nav, .sidebar, [role="complementary"] { display: none !important; }
                         
                         /* Show only the print area */
                         #print-area, #print-area * { visibility: visible !important; } 
+                        
+                        /* EXPLICITLY HIDE no-print elements even inside print-area */
+                        .no-print, .no-print * { 
+                            visibility: hidden !important; 
+                            display: none !important; 
+                        }
+
                         #print-area { 
                             position: fixed !important; 
                             left: 0 !important; 
@@ -336,6 +343,7 @@ export default function QuotesPage() {
                             padding: 0 !important; 
                             margin: 0 !important;
                             background: white !important;
+                            z-index: 9999 !important;
                         } 
                         .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
                         .attach-item { margin-bottom: 40px; break-inside: avoid; }

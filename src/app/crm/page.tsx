@@ -292,10 +292,32 @@ export default function SalesManagementPage() {
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
                     @media print { 
-                        body * { visibility: hidden; } 
-                        #print-area, #print-area * { visibility: visible; } 
-                        #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; } 
-                        .no-print { display: none; } 
+                        /* Hide everything by default */
+                        body * { visibility: hidden !important; }
+                        aside, header, nav, .sidebar, [role="complementary"] { display: none !important; }
+                        
+                        /* Show only the print area */
+                        #print-area, #print-area * { visibility: visible !important; } 
+                        
+                        /* EXPLICITLY HIDE no-print elements even inside print-area */
+                        .no-print, .no-print * { 
+                            visibility: hidden !important; 
+                            display: none !important; 
+                        }
+
+                        #print-area { 
+                            position: fixed !important; 
+                            left: 0 !important; 
+                            top: 0 !important; 
+                            width: 100% !important; 
+                            height: 100% !important;
+                            padding: 0 !important; 
+                            margin: 0 !important;
+                            background: white !important;
+                            z-index: 9999 !important;
+                        } 
+                        
+                        @page { size: auto; margin: 15mm; }
                     }
                     .statement-table th { background: #f8fafc !important; color: #1e293b !important; border: 1px solid #cbd5e1; font-weight: 700; font-size: 11px; height: 35px; }
                     .statement-table td { border: 1px solid #cbd5e1; padding: 6px 8px; font-size: 11px; }
@@ -327,11 +349,11 @@ export default function SalesManagementPage() {
                                         <p>등록번호: {company.bizNo}</p>
                                         <p>대표자: {company.ceo} (인)</p>
                                         <p>주소: {company.address}</p>
-                                        <p>업태: 도소매 / 종목: 전자부품, 조명기구</p>
+                                        <p>업태: {company.bizType || '도소매'} / 종목: {company.bizItem || '전자부품, 조명기구'}</p>
                                     </div>
                                 </div>
-                                <div style={{ position: 'relative' }}>
-                                    {company.stampUrl && <img src={company.stampUrl} alt="Stamp" style={{ width: '65px', opacity: 0.85 }} />}
+                                <div style={{ position: 'relative', width: '120px', height: '120px' }}>
+                                    {company.stampUrl && <img src={company.stampUrl} alt="Stamp" style={{ position: 'absolute', right: 0, bottom: 0, width: '120px', height: '120px', opacity: 0.85 }} />}
                                 </div>
                             </div>
                         </div>
@@ -410,7 +432,12 @@ export default function SalesManagementPage() {
                     <button onClick={() => setView('list')} style={{ background: '#475569', color: 'white', padding: '12px 25px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
                         <ArrowLeft size={18} /> 목록으로 돌아가기
                     </button>
-                    <button onClick={() => window.print()} style={{ background: 'linear-gradient(135deg, #0070f3 0%, #00a6fb 100%)', color: 'white', padding: '12px 40px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 700, boxShadow: '0 4px 15px rgba(0,112,243,0.3)' }}>
+                    <button onClick={() => {
+                        const originalTitle = document.title;
+                        document.title = `${printData.date}_거래명세표_${printData.code}`;
+                        window.print();
+                        document.title = originalTitle;
+                    }} style={{ background: 'linear-gradient(135deg, #0070f3 0%, #00a6fb 100%)', color: 'white', padding: '12px 40px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', fontWeight: 700, boxShadow: '0 4px 15px rgba(0,112,243,0.3)' }}>
                         <Printer size={18} /> 거래명세표 인쇄하기
                     </button>
                 </div>
