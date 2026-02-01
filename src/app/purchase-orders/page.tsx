@@ -381,7 +381,6 @@ export default function PurchaseOrdersPage() {
                             </div>
                         </div>
                         <div style={{ textAlign: 'right', position: 'relative' }}>
-                            {company.logoUrl && <img src={company.logoUrl} alt="Logo" style={{ height: '55px', marginBottom: '15px' }} />}
                             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 5px 0' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.85rem', color: '#353b48', lineHeight: '1.4' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>

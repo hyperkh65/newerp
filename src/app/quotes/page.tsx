@@ -348,7 +348,6 @@ export default function QuotesPage() {
                             </div>
                         </div>
                         <div style={{ textAlign: 'right', position: 'relative' }}>
-                            {company.logoUrl && <img src={company.logoUrl} alt="Logo" style={{ height: '60px', marginBottom: '15px' }} />}
                             <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.5' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
