@@ -55,30 +55,28 @@ export default function Dashboard() {
         try {
             setLoading(true);
 
+            // Helper to safely fetch data without throwing error
+            const safeQuery = (db: string, opts?: any) =>
+                notionQuery(db, opts).catch(err => {
+                    console.error('Failed to load DB:', db, err);
+                    return { results: [] };
+                });
+
             // Fetch all counts in parallel
             const [hrRes, prodsRes, quotesRes, clientsRes, salesRes, scheduleRes] = await Promise.all([
-                notionQuery(DB_HR),
-                notionQuery(DB_PRODUCTS),
-                notionQuery(DB_QUOTES),
-                notionQuery(DB_CLIENTS),
-                notionQuery(DB_SALES, {
+                safeQuery(DB_HR),
+                safeQuery(DB_PRODUCTS),
+                safeQuery(DB_QUOTES),
+                safeQuery(DB_CLIENTS),
+                safeQuery(DB_SALES, {
                     sorts: [{ property: 'Date', direction: 'descending' }],
                     page_size: 100
                 }),
-                notionQuery(DB_SCHEDULE, {
+                safeQuery(DB_SCHEDULE, {
                     sorts: [{ property: 'date', direction: 'ascending' }],
                     page_size: 10
                 })
             ]);
-
-            console.log('API Responses:', {
-                hrRes: hrRes.results?.length,
-                prodsRes: prodsRes.results?.length,
-                quotesRes: quotesRes.results?.length,
-                clientsRes: clientsRes.results?.length,
-                salesRes: salesRes.results?.length,
-                scheduleRes: scheduleRes.results?.length
-            });
 
             const hrCount = hrRes.results?.length || 0;
             const prodsCount = prodsRes.results?.length || 0;
