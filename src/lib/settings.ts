@@ -1,4 +1,4 @@
-import { COMPANY_INFO } from './notion';
+import { COMPANY_INFO, DB_SETTINGS, notionQuery, notionCreate, notionUpdate, RT, TITLE, email as EMAIL } from './notion';
 
 export interface CompanySettings {
     name: string;
@@ -38,5 +38,67 @@ export const getSettings = (): CompanySettings => {
 export const saveSettings = (settings: CompanySettings) => {
     if (typeof window !== 'undefined') {
         localStorage.setItem('ynk_erp_settings', JSON.stringify(settings));
+    }
+};
+
+export const fetchCompanySettings = async (): Promise<CompanySettings> => {
+    try {
+        const res = await notionQuery(DB_SETTINGS);
+        if (res.results.length > 0) {
+            const p = res.results[0].properties;
+            const settings: CompanySettings = {
+                name: p.name?.title?.[0]?.plain_text || COMPANY_INFO.name,
+                ceo: p.ceo?.rich_text?.[0]?.plain_text || COMPANY_INFO.ceo,
+                bizNo: p['business no']?.rich_text?.[0]?.plain_text || COMPANY_INFO.bizNo,
+                address: p.address?.rich_text?.[0]?.plain_text || COMPANY_INFO.address,
+                tel: p.tel?.rich_text?.[0]?.plain_text || COMPANY_INFO.tel,
+                fax: p.fax?.rich_text?.[0]?.plain_text || COMPANY_INFO.fax,
+                email: p.email?.email || COMPANY_INFO.email,
+                bank: p['account domestic']?.rich_text?.[0]?.plain_text || COMPANY_INFO.bank,
+                bankForeign1: p['account overseas 1']?.rich_text?.[0]?.plain_text || COMPANY_INFO.bankForeign1,
+                bankForeign2: p['account overseas 2']?.rich_text?.[0]?.plain_text || COMPANY_INFO.bankForeign2,
+                logoUrl: p.logo?.url || COMPANY_INFO.logoUrl,
+                stampUrl: p.stamp?.url || COMPANY_INFO.stampUrl,
+                bizType: p['category 1']?.rich_text?.[0]?.plain_text || '도소매',
+                bizItem: p['category 2']?.rich_text?.[0]?.plain_text || '전자부품, 조명기구'
+            };
+            saveSettings(settings);
+            return settings;
+        }
+    } catch (e) {
+        console.error('Failed to fetch settings from Notion:', e);
+    }
+    return getSettings();
+};
+
+export const saveCompanySettingsNotion = async (settings: CompanySettings) => {
+    saveSettings(settings); // Local caching first
+    try {
+        const res = await notionQuery(DB_SETTINGS);
+        const props = {
+            name: TITLE(settings.name),
+            ceo: RT(settings.ceo),
+            'business no': RT(settings.bizNo),
+            address: RT(settings.address),
+            tel: RT(settings.tel),
+            fax: RT(settings.fax),
+            email: EMAIL(settings.email),
+            'account domestic': RT(settings.bank),
+            'account overseas 1': RT(settings.bankForeign1),
+            'account overseas 2': RT(settings.bankForeign2),
+            logo: { url: settings.logoUrl || null },
+            stamp: { url: settings.stampUrl || null },
+            'category 1': RT(settings.bizType),
+            'category 2': RT(settings.bizItem)
+        };
+
+        if (res.results.length > 0) {
+            await notionUpdate(res.results[0].id, props);
+        } else {
+            await notionCreate(DB_SETTINGS, props);
+        }
+    } catch (e) {
+        console.error('Failed to save settings to Notion:', e);
+        throw e;
     }
 };

@@ -2,21 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Database, Shield, Building, Info, CheckCircle2, Save, Link as LinkIcon } from 'lucide-react';
-import { getSettings, saveSettings, CompanySettings } from '@/lib/settings';
+import { getSettings, saveSettings, CompanySettings, fetchCompanySettings, saveCompanySettingsNotion } from '@/lib/settings';
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState<CompanySettings | null>(null);
     const [saved, setSaved] = useState(false);
 
     useEffect(() => {
-        setSettings(getSettings());
+        fetchCompanySettings().then(setSettings);
     }, []);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (settings) {
-            saveSettings(settings);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
+            try {
+                await saveCompanySettingsNotion(settings);
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2000);
+            } catch (e) {
+                alert('설정 저장 중 오류가 발생했습니다.');
+            }
         }
     };
 

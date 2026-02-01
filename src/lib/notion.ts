@@ -28,6 +28,7 @@ export const DB_IMPORTS_DETAIL = '2ae1f4ff9a0e80b18652c3f9448b59fc';
 export const DB_INVOICES = '2f81f4ff9a0e80c69bdaff32bed85b90';
 export const DB_INVOICE_DETAIL = '2f81f4ff9a0e80fc8ecafb9b9f38e32b';
 export const DB_SCHEDULE = '2f81f4ff9a0e808aadbdee348204eb7c';
+export const DB_SETTINGS = '2fa1f4ff9a0e8081b816f06ee2665de5';
 
 /* --------- Field Helpers --------- */
 export const rt = (t: string) => ({ rich_text: [{ type: 'text', text: { content: String(t || '') } }] });

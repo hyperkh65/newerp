@@ -469,24 +469,30 @@ export default function AccountingPage() {
                                     </>
                                 )}
                             </div>
-                            <div style={{ textAlign: 'right', position: 'relative', width: '350px' }}>
-                                <p style={{ fontWeight: 800, marginBottom: '80px' }}>AUTHORIZED SIGNATURE</p>
-                                <div style={{ borderBottom: '1px solid #000', marginBottom: '10px' }}></div>
-                                <p style={{ fontSize: '1rem', fontWeight: 700 }}>{company.name}</p>
-                                {company.stampUrl && (
-                                    <img
-                                        src={company.stampUrl}
-                                        style={{
-                                            position: 'absolute',
-                                            top: '0',
-                                            right: '0',
-                                            width: '320px',
-                                            opacity: 0.85,
-                                            transform: 'translate(10%, 10%) rotate(-5deg)',
-                                            zIndex: 10
-                                        }}
-                                    />
-                                )}
+                            <div style={{ textAlign: 'center', position: 'relative', width: '400px', paddingTop: '20px' }}>
+                                <div style={{ marginBottom: '40px' }}>
+                                    <span style={{ fontSize: '1.3rem', fontWeight: 900, borderBottom: '2px solid #000', paddingBottom: '5px' }}>위 금액을 정히 영수(청구)함</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', paddingRight: '10px' }}>
+                                    <p style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '5px' }}>{new Date().toLocaleDateString()}</p>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '5px' }}>{company.name}</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: 700, position: 'relative' }}>
+                                        대표이사 {company.ceo} <span style={{ marginLeft: '10px' }}>(인)</span>
+                                        {company.stampUrl && (
+                                            <img
+                                                src={company.stampUrl}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '-40px',
+                                                    right: '-20px',
+                                                    width: '120px',
+                                                    opacity: 0.9,
+                                                    zIndex: 10
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div style={{ marginTop: '40px', textAlign: 'center' }}>
