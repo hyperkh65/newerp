@@ -41,6 +41,11 @@ interface PORecord {
     attacht2?: string;
     attacht3?: string;
     root?: string;
+    supplierDetail?: {
+        address: string;
+        bizNo: string;
+        ceo: string;
+    };
 }
 
 const getCurrencySymbol = (cur: string) => {
@@ -327,10 +332,22 @@ export default function PurchaseOrdersPage() {
         alert(`${quote.no} 견적 내용이 불러와졌습니다. (가격은 0으로 설정되었습니다)`);
     };
     const handlePrint = (p: PORecord) => {
-        setPrintData(p);
+        // 공급업체 정보 매핑
+        const supDoc = suppliers.find(s => {
+            const sName = s.properties.ClientName?.title?.[0]?.plain_text || s.properties.ClientName?.rich_text?.[0]?.plain_text;
+            return sName === p.supplier;
+        });
+
+        const supplierDetail = supDoc ? {
+            address: supDoc.properties.Address?.rich_text?.[0]?.plain_text || supDoc.properties['주소']?.rich_text?.[0]?.plain_text || '',
+            bizNo: supDoc.properties.BizNo?.rich_text?.[0]?.plain_text || supDoc.properties['사업자번호']?.rich_text?.[0]?.plain_text || '',
+            ceo: supDoc.properties.CEO?.rich_text?.[0]?.plain_text || supDoc.properties['대표자']?.rich_text?.[0]?.plain_text || ''
+        } : undefined;
+
+        setPrintData({ ...p, supplierDetail });
         setCompany(getSettings());
         setView('print');
-        setTimeout(() => window.print(), 500);
+        // window.print calls are removed to allow rendering first
     };
 
     if (view === 'print' && printData) {
@@ -371,6 +388,9 @@ export default function PurchaseOrdersPage() {
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
                                 <p style={{ margin: '2px 0' }}>Biz No: {company.bizNo}</p>
                                 <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
+                                <div style={{ marginTop: '5px', display: 'inline-block', background: 'rgba(230,126,34,0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#e67e22' }}>
+                                    업태: {company.bizType} / 종목: {company.bizItem}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -381,6 +401,15 @@ export default function PurchaseOrdersPage() {
                             <div style={{ background: '#2c3e50', color: 'white', padding: '8px 15px', fontSize: '0.9rem', fontWeight: 700 }}>SUPPLIER (VENDER)</div>
                             <div style={{ padding: '15px' }}>
                                 <p style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 10px 0' }}>{printData.supplier} <span style={{ fontSize: '1rem', fontWeight: 400 }}>貴下</span></p>
+
+                                {printData.supplierDetail && (
+                                    <div style={{ marginBottom: '10px', fontSize: '0.9rem', color: '#555', lineHeight: '1.4' }}>
+                                        {printData.supplierDetail.address && <p style={{ margin: '2px 0' }}>{printData.supplierDetail.address}</p>}
+                                        {printData.supplierDetail.ceo && <p style={{ margin: '2px 0' }}>ATTN: {printData.supplierDetail.ceo}</p>}
+                                        {printData.supplierDetail.bizNo && <p style={{ margin: '2px 0' }}>Biz No: {printData.supplierDetail.bizNo}</p>}
+                                    </div>
+                                )}
+
                                 <p style={{ fontSize: '0.9rem', color: '#353b48', lineHeight: '1.6' }}>상기 물품을 아래와 같이 발주하오니,<br />납기 내에 입고될 수 있도록 협조 바랍니다.</p>
                             </div>
                         </div>
@@ -468,9 +497,9 @@ export default function PurchaseOrdersPage() {
                                     style={{
                                         position: 'absolute',
                                         left: '50%',
-                                        bottom: '30px',
-                                        transform: 'translateX(-50%)',
-                                        width: '240px',
+                                        bottom: '20px',
+                                        transform: 'translateX(-40%) rotate(-5deg)',
+                                        width: '320px',
                                         opacity: 0.9,
                                         zIndex: 1
                                     }}

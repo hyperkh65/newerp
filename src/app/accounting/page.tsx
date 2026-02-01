@@ -41,6 +41,11 @@ interface Invoice {
     description: string;
     attachment?: { name: string; url: string };
     items?: InvoiceItem[];
+    clientInfo?: {
+        address: string;
+        bizNo: string;
+        ceo: string;
+    };
 }
 
 export default function AccountingPage() {
@@ -323,7 +328,16 @@ export default function AccountingPage() {
                     amount: p.Amount?.number || 0
                 };
             });
-            setPrintData({ ...inv, items });
+
+            // 고객사 정보 매핑
+            const clientDoc = clients.find(c => c.properties.ClientName?.title?.[0]?.plain_text === inv.client);
+            const clientInfo = clientDoc ? {
+                address: clientDoc.properties.Address?.rich_text?.[0]?.plain_text || clientDoc.properties['주소']?.rich_text?.[0]?.plain_text || '',
+                bizNo: clientDoc.properties.BizNo?.rich_text?.[0]?.plain_text || clientDoc.properties['사업자번호']?.rich_text?.[0]?.plain_text || '',
+                ceo: clientDoc.properties.CEO?.rich_text?.[0]?.plain_text || clientDoc.properties['대표자']?.rich_text?.[0]?.plain_text || ''
+            } : undefined;
+
+            setPrintData({ ...inv, items, clientInfo });
             setView('print');
         } catch (e) {
             alert('출력 데이터 로드 실패');
@@ -382,7 +396,11 @@ export default function AccountingPage() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '40px', marginBottom: '40px' }}>
                         <div>
-                            <p style={{ fontWeight: 800, marginBottom: '5px' }}>TO: {printData.client}</p>
+                            <p style={{ fontWeight: 800, marginBottom: '5px', fontSize: '1.1rem' }}>TO: {printData.client}</p>
+                            {printData.clientInfo?.address && <p style={{ fontSize: '0.9rem', marginBottom: '2px' }}>{printData.clientInfo.address}</p>}
+                            {printData.clientInfo?.ceo && <p style={{ fontSize: '0.9rem', marginBottom: '2px' }}>ATTN: {printData.clientInfo.ceo}</p>}
+                            {printData.clientInfo?.bizNo && <p style={{ fontSize: '0.9rem', marginBottom: '10px' }}>BIZ NO: {printData.clientInfo.bizNo}</p>}
+
                             <p style={{ fontSize: '0.9rem' }}>DATE: {printData.issueDate}</p>
                             <p style={{ fontSize: '0.9rem' }}>REF NO: {printData.invoiceNo}</p>
                             <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #000' }}>
@@ -396,6 +414,9 @@ export default function AccountingPage() {
                             <p style={{ fontSize: '0.85rem' }}>TEL: {company.tel} / FAX: {company.fax}</p>
                             <p style={{ fontSize: '0.85rem' }}>EMAIL: {company.email || ''}</p>
                             <p style={{ fontSize: '0.85rem' }}>BIZ NO: {company.bizNo}</p>
+                            <div style={{ marginTop: '5px', display: 'inline-block', background: 'rgba(0,112,243,0.1)', padding: '5px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#0070f3' }}>
+                                업태: {company.bizType} / 종목: {company.bizItem}
+                            </div>
                         </div>
                     </div>
 

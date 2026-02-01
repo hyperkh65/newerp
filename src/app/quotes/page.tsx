@@ -40,6 +40,11 @@ interface QuoteRecord {
     attacht2?: string;
     attacht3?: string;
     docType?: 'QUOTE' | 'PROFORMA';
+    clientInfo?: {
+        address: string;
+        bizNo: string;
+        ceo: string;
+    };
 }
 
 const getCurrencySymbol = (cur: string) => {
@@ -293,10 +298,21 @@ export default function QuotesPage() {
     };
 
     const handlePrint = (q: QuoteRecord) => {
-        setPrintData(q);
+        // 고객사 정보 매핑
+        const clientDoc = clients.find(c => {
+            const cName = c.properties.ClientName?.title?.[0]?.plain_text || c.properties.ClientName?.rich_text?.[0]?.plain_text;
+            return cName === q.client;
+        });
+
+        const clientInfo = clientDoc ? {
+            address: clientDoc.properties.Address?.rich_text?.[0]?.plain_text || clientDoc.properties['주소']?.rich_text?.[0]?.plain_text || '',
+            bizNo: clientDoc.properties.BizNo?.rich_text?.[0]?.plain_text || clientDoc.properties['사업자번호']?.rich_text?.[0]?.plain_text || '',
+            ceo: clientDoc.properties.CEO?.rich_text?.[0]?.plain_text || clientDoc.properties['대표자']?.rich_text?.[0]?.plain_text || ''
+        } : undefined;
+
+        setPrintData({ ...q, clientInfo });
         setCompany(getSettings());
         setView('print');
-        setTimeout(() => window.print(), 500);
     };
 
     if (view === 'print' && printData) {
@@ -339,6 +355,9 @@ export default function QuotesPage() {
                                 <p style={{ margin: '2px 0' }}>CEO: {company.ceo} | Biz No: {company.bizNo}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
                                 <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
+                                <div style={{ marginTop: '5px', display: 'inline-block', background: 'rgba(0,112,243,0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600, color: '#0070f3' }}>
+                                    업태: {company.bizType} / 종목: {company.bizItem}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -357,7 +376,16 @@ export default function QuotesPage() {
                         <div style={{ flex: 1, padding: '20px', background: '#f8fafc', borderRadius: '8px', borderLeft: '6px solid #1a202c' }}>
                             <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#718096', textTransform: 'uppercase', marginBottom: '10px' }}>To (Receiver)</h3>
                             <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a202c', margin: 0 }}>{printData.client} <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>貴下</span></p>
-                            <p style={{ marginTop: '10px', fontSize: '1rem', color: '#1a202c', lineHeight: '1.6', fontWeight: 500 }}>
+
+                            {printData.clientInfo && (
+                                <div style={{ marginTop: '8px', fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.4' }}>
+                                    {printData.clientInfo.address && <p style={{ margin: '2px 0' }}>{printData.clientInfo.address}</p>}
+                                    {printData.clientInfo.ceo && <p style={{ margin: '2px 0' }}>ATTN: {printData.clientInfo.ceo}</p>}
+                                    {printData.clientInfo.bizNo && <p style={{ margin: '2px 0' }}>Biz No: {printData.clientInfo.bizNo}</p>}
+                                </div>
+                            )}
+
+                            <p style={{ marginTop: '15px', fontSize: '1rem', color: '#1a202c', lineHeight: '1.6', fontWeight: 500 }}>
                                 {printData.docType === 'PROFORMA'
                                     ? '당사 제품을 발주해 주셔서 대단히 감사합니다. 귀사의 발주 내용을 바탕으로 본 Proforma Invoice를 발행하오니, 명시된 조건과 품목을 확인해 주시기 바랍니다.'
                                     : '귀사의 무궁한 발전을 기원하며, 아래와 같이 견적드립니다.'}
@@ -453,10 +481,10 @@ export default function QuotesPage() {
                                         style={{
                                             position: 'absolute',
                                             right: '50%',
-                                            bottom: '10px',
-                                            width: '240px',
+                                            bottom: '-10px',
+                                            width: '320px',
                                             opacity: 0.9,
-                                            transform: 'translateX(50%)',
+                                            transform: 'translateX(60%) rotate(-5deg)',
                                             zIndex: 1
                                         }}
                                     />
