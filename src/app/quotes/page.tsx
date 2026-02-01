@@ -388,8 +388,8 @@ export default function QuotesPage() {
                                 <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700, color: '#1a202c' }}>{printData.date}</span></p>
                             </div>
                         </div>
-                        <div style={{ textAlign: 'right', minWidth: 'min-content', flexShrink: 0 }}>
-                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c', whiteSpace: 'nowrap' }}>{company.name}</h2>
+                        <div style={{ textAlign: 'right', minWidth: 'max-content', flexShrink: 0 }}>
+                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c', whiteSpace: 'nowrap', display: 'inline-block' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.5', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>

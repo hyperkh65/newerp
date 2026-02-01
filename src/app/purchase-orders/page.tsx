@@ -421,8 +421,8 @@ export default function PurchaseOrdersPage() {
                                 <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700 }}>{printData.date}</span></p>
                             </div>
                         </div>
-                        <div style={{ textAlign: 'right', minWidth: 'min-content', flexShrink: 0 }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 5px 0', whiteSpace: 'nowrap' }}>{company.name}</h2>
+                        <div style={{ textAlign: 'right', minWidth: 'max-content', flexShrink: 0 }}>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 5px 0', whiteSpace: 'nowrap', display: 'inline-block' }}>{company.name}</h2>
                             <div style={{ fontSize: '0.85rem', color: '#353b48', lineHeight: '1.4', position: 'relative' }}>
                                 <p style={{ margin: '2px 0' }}>{company.address}</p>
                                 <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>

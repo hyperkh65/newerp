@@ -458,7 +458,7 @@ export default function AccountingPage() {
                         </div>
                         <div className="box-right">
                             <p className="info-label">공급자 (SELLER)</p>
-                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0', whiteSpace: 'nowrap' }}>{company.name}</h2>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '15px 0 25px 0', whiteSpace: 'nowrap', display: 'inline-block' }}>{company.name}</h2>
                             <div style={{ fontSize: '1rem', lineHeight: '1.8' }}>
                                 <p><span style={{ fontWeight: 600, display: 'inline-block', width: '80px' }}>등록번호:</span> {company.bizNo}</p>
                                 <p>

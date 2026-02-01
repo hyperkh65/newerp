@@ -354,7 +354,7 @@ export default function SalesManagementPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
                                     <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px' }}>공급자 (SELLER)</p>
-                                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 5px 0', whiteSpace: 'nowrap' }}>{company.name}</h2>
+                                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0 0 5px 0', whiteSpace: 'nowrap', display: 'inline-block' }}>{company.name}</h2>
                                     <div style={{ fontSize: '0.8rem', lineHeight: '1.5' }}>
                                         <p>등록번호: {company.bizNo}</p>
                                         <p>대표자: {company.ceo} (인)</p>
