@@ -509,11 +509,11 @@ export default function QuotesPage() {
                                         style={{
                                             position: 'absolute',
                                             right: '10%',
-                                            bottom: '10px',
-                                            width: '160px',
-                                            height: '160px',
+                                            bottom: '5px',
+                                            width: '320px',
+                                            height: 'auto',
                                             opacity: 0.65,
-                                            transform: 'rotate(-5deg)',
+                                            transform: 'rotate(-2deg)',
                                             zIndex: 1,
                                             pointerEvents: 'none'
                                         }}

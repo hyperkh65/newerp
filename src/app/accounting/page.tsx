@@ -539,12 +539,12 @@ export default function AccountingPage() {
                                     style={{
                                         position: 'absolute',
                                         right: '10%',
-                                        bottom: '10px',
-                                        width: '160px',
-                                        height: '160px',
-                                        opacity: 0.45,
+                                        bottom: '5px',
+                                        width: '320px',
+                                        height: 'auto',
+                                        opacity: 0.5,
                                         zIndex: 1,
-                                        transform: 'rotate(-5deg)',
+                                        transform: 'rotate(-2deg)',
                                         pointerEvents: 'none'
                                     }}
                                 />

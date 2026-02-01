@@ -432,14 +432,14 @@ export default function SalesManagementPage() {
                                     alt="Stamp"
                                     style={{
                                         position: 'absolute',
-                                        right: '10%',
-                                        width: '160px',
-                                        height: '160px',
+                                        right: '5%',
+                                        width: '300px',
+                                        height: 'auto',
                                         opacity: 0.4,
                                         zIndex: 1,
-                                        transform: 'rotate(-5deg)',
+                                        transform: 'rotate(-2deg)',
                                         pointerEvents: 'none',
-                                        bottom: '10px'
+                                        bottom: '0px'
                                     }}
                                 />
                             )}
