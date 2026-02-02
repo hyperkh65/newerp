@@ -266,19 +266,38 @@ export default function ProductsPage() {
         try {
             if (!confirm(`${selectedProducts.length}개의 제품을 등록하시겠습니까?`)) return;
 
+            // 채번 로직 계산
+            const year = new Date().getFullYear().toString().slice(-2);
+            const prefix = `P${year}-`;
+            const relevantCodes = products
+                .map(p => p.properties.ProductCode?.rich_text?.[0]?.plain_text || '')
+                .filter(code => code.startsWith(prefix));
+
+            let nextIndex = 1;
+            if (relevantCodes.length > 0) {
+                const indices = relevantCodes
+                    .map(code => parseInt(code.replace(prefix, '')))
+                    .filter(idx => !isNaN(idx));
+                nextIndex = indices.length > 0 ? Math.max(...indices) + 1 : 1;
+            }
+
             // Register sequentially to avoid API limits if many
             let successCount = 0;
             for (const prod of selectedProducts) {
+                const generatedCode = `${prefix}${String(nextIndex).padStart(3, '0')}`;
+                nextIndex++;
+
                 // Map AI data to form structure
-                // Note: AI gives generic 'specs', we can try to parse or put in detail
                 const formData = {
-                    code: prod.model || '',
+                    code: generatedCode,
                     name: prod.name || 'AI 추출 제품',
                     category: prod.category || '',
                     cost: prod.price || 0,
                     maker: prod.manufacturer || '',
                     supplier: '',
-                    detail: (prod.specs || '') + (prod.notes ? `\n\n${prod.notes}` : ''),
+                    detail: (prod.model ? `추출 모델명/사양: ${prod.model}\n` : '') +
+                        (prod.specs || '') +
+                        (prod.notes ? `\n\n${prod.notes}` : ''),
                     inputA: '', outputV: '', outputA: '', material: '', size: '', converter: '',
                     image: null, fileSpec: null, fileEMI: null, fileEfficiency: null, fileKSKC: null, fileEtc: null
                 };
