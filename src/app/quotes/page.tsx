@@ -329,255 +329,184 @@ export default function QuotesPage() {
 
     if (view === 'print' && printData) {
         return (
-            <div id="print-area" style={{ padding: '0', background: 'white', color: 'black', minHeight: '100vh', fontFamily: '"Noto Sans KR", sans-serif' }}>
+            <div id="print-area" style={{ padding: '0', background: 'white', color: '#171717', minHeight: '100vh', fontFamily: '"Noto Sans KR", sans-serif', boxSizing: 'border-box' }}>
                 <style>{`
-                    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+                    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
                     @media print { 
-                        /* Hide everything by default */
                         body * { visibility: hidden !important; }
-                        aside, header, nav, .sidebar, [role="complementary"] { display: none !important; }
-                        
-                        /* Show only the print area */
                         #print-area, #print-area * { visibility: visible !important; } 
-                        
-                        /* EXPLICITLY HIDE no-print elements even inside print-area */
-                        .no-print, .no-print * { 
-                            visibility: hidden !important; 
-                            display: none !important; 
-                        }
-
-                        #print-area { 
-                            position: absolute !important; 
-                            left: 0 !important; 
-                            top: 0 !important; 
-                            width: 100% !important; 
-                            margin: 0 !important;
-                            padding: 0 !important; 
-                            background: white !important;
-                            z-index: 9999 !important;
-                        } 
-                        
-                        /* Multi-page support */
-                        table { page-break-inside: auto; }
-                        tr { page-break-inside: avoid; page-break-after: auto; }
-                        thead { display: table-header-group; }
-                        tfoot { display: table-footer-group; }                        .appendix-page { page-break-before: always; padding: 50px 40px; background: white; color: black; }
-                        .attach-item { margin-bottom: 40px; break-inside: avoid; }
-                        .attach-img { max-width: 100%; height: auto; max-height: 480px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; display: block; }
-                        
-                        @page { size: auto; margin: 10mm; }
+                        #print-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 20px !important; z-index: 9999 !important; background: white !important; }
+                        .no-print { display: none !important; }
+                        @page { size: auto; margin: 0mm; }
                     }
-                    .pi-table th { background: #1a202c !important; color: white !important; -webkit-print-color-adjust: exact; font-weight: 500; font-size: 11px; }
-                    .pi-table td { font-size: 11px; border: 0.5px solid #e2e8f0; }
-                    .pi-total-row { background: #f8fafc !important; -webkit-print-color-adjust: exact; }
+                    .quote-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                    .quote-table th { text-align: center; border-top: 2px solid #171717; border-bottom: 1px solid #171717; padding: 10px 4px; font-size: 11px; font-weight: 700; color: #171717; background: #f9f9f9; text-transform: uppercase; }
+                    .quote-table td { border-bottom: 1px solid #e5e5e5; padding: 10px 4px; font-size: 11px; color: #333; vertical-align: middle; }
+                    .quote-table tr:last-child td { border-bottom: 1px solid #171717; }
+                    .box-container { display: flex; gap: 30px; margin-bottom: 30px; }
+                    .box { flex: 1; border: 1px solid #e5e5e5; padding: 20px; border-radius: 8px; position: relative; }
+                    .box-title { position: absolute; top: -10px; left: 15px; background: white; padding: 0 10px; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+                    .box-content { font-size: 13px; line-height: 1.6; color: #333; }
                 `}</style>
-
-                <div style={{ padding: '20px 0' }}>
-                    {/* Header Top Section */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', position: 'relative' }}>
-                        {company.logoUrl && (
-                            <img src={company.logoUrl} alt="Logo" style={{ height: '70px', maxWidth: '180px', objectFit: 'contain' }} />
-                        )}
-                        <div style={{ flex: 1, textAlign: 'center' }}>
-                            <h1 style={{ fontSize: '3.5rem', fontWeight: 900, letterSpacing: '8px', margin: '0 0 10px 0', color: '#1a202c' }}>
+                <div style={{ padding: '40px' }}>
+                    {/* Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '50px' }}>
+                        <div style={{ width: '30%' }}>
+                            {company.logoUrl && (
+                                <img src={company.logoUrl} alt="Logo" style={{ height: '45px', objectFit: 'contain', display: 'block' }} />
+                            )}
+                        </div>
+                        <div style={{ textAlign: 'center', flex: 1 }}>
+                            <h1 style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '4px', margin: '0 0 5px 0', color: '#171717' }}>
                                 {printData.docType === 'PROFORMA' ? 'PROFORMA INVOICE' : 'QUOTATION'}
                             </h1>
-                            <div style={{ background: '#1a202c', height: '4px', width: '100px', margin: '0 auto 20px auto' }}></div>
-                            <div style={{ fontSize: '1.1rem', color: '#4a5568' }}>
-                                <p style={{ margin: '5px 0' }}>Ref No: <span style={{ fontWeight: 700, color: '#1a202c' }}>{printData.no}</span></p>
-                                <p style={{ margin: '5px 0' }}>Date: <span style={{ fontWeight: 700, color: '#1a202c' }}>{printData.date}</span></p>
+                            <div style={{ width: '40px', height: '4px', background: '#171717', margin: '15px auto' }}></div>
+                        </div>
+                        <div style={{ width: '30%', textAlign: 'right' }}>
+                            <div style={{ fontSize: '11px', color: '#888', marginBottom: '4px', textTransform: 'uppercase' }}>Reference No.</div>
+                            <div style={{ fontSize: '16px', fontWeight: 700, color: '#171717', marginBottom: '10px' }}>{printData.no}</div>
+
+                            <div style={{ fontSize: '11px', color: '#888', marginBottom: '4px', textTransform: 'uppercase' }}>Date</div>
+                            <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>{printData.date}</div>
+                        </div>
+                    </div>
+
+                    {/* Company Info (Seller) & Client (Buyer) */}
+                    <div className="box-container">
+                        {/* Seller (From) */}
+                        <div className="box" style={{ background: '#fafafa', border: 'none' }}>
+                            <div className="box-title" style={{ background: '#fafafa' }}>From (Seller)</div>
+                            <div className="box-content">
+                                <div style={{ fontSize: '16px', fontWeight: 800, marginBottom: '10px', color: '#171717' }}>{company.name}</div>
+                                <div style={{ marginBottom: '2px' }}>{company.address}</div>
+                                <div style={{ marginBottom: '2px' }}>Tel: {company.tel} / Fax: {company.fax}</div>
+                                <div>Email: {company.email}</div>
                             </div>
                         </div>
-                        <div style={{ textAlign: 'right', minWidth: 'max-content', flexShrink: 0 }}>
-                            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0 0 10px 0', color: '#1a202c', whiteSpace: 'nowrap', display: 'inline-block' }}>{company.name}</h2>
-                            <div style={{ fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.5', position: 'relative' }}>
-                                <p style={{ margin: '2px 0' }}>{company.address}</p>
-                                <p style={{ margin: '2px 0' }}>
-                                    CEO: {company.ceo} (인) | Biz No: {company.bizNo}
-                                </p>
-                                <p style={{ margin: '2px 0' }}>Tel: {company.tel} | Fax: {company.fax}</p>
-                                <p style={{ margin: '2px 0' }}>Email: {company.email || ''}</p>
+
+                        {/* Buyer (To) */}
+                        <div className="box">
+                            <div className="box-title">To (Buyer)</div>
+                            <div className="box-content">
+                                <div style={{ fontSize: '18px', fontWeight: 800, marginBottom: '10px', color: '#171717' }}>{printData.client}</div>
+                                {printData.clientInfo && (
+                                    <>
+                                        <div style={{ marginBottom: '2px' }}>Attn: {printData.clientInfo.ceo || '-'}</div>
+                                        <div style={{ marginBottom: '2px' }}>{printData.clientInfo.address}</div>
+                                        <div>Biz No: {printData.clientInfo.bizNo}</div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Client Info Section */}
-                    {/* ... (Client Info Section 생략 - 변경 없음) ... */}
-
-                    {/* (Client Info Section 코드 블록이 너무 길어서 끊길 수 있으므로, 헤더 부분만 먼저 교체하고 하단은 별도로 교체하거나, 전체 구조가 파악되었으니 안전하게 부분 교체 진행) */}
-                    {/* 여기서는 헤더 부분만 교체하고, 하단은 별도 청크로 처리하는 것이 안전함. 하지만 tool call은 한번에 하나의 파일만 건드려야 하므로, multi_replace 사용 불가. replace_file_content는 하나만 됨. */}
-                    {/* 따라서 헤더 부분과 하단 부분을 포함할 수 없으므로(Client Info와 Table이 중간에 낌), 일단 헤더만 수정하고 다시 호출해서 하단 수정. */}
-                    {/* 아, replace_file_content는 contiguous block만 가능하므로 2번 호출해야 함. */}
-                    {/* 일단 이 툴 호출에서는 '헤더' 부분만 처리하고, 이어서 '하단' 처리. */}
-
-                    {/* Client Info Section */}
-                    <div style={{ display: 'flex', gap: '40px', marginBottom: '40px' }}>
-                        <div style={{ flex: 1, padding: '20px', background: '#f8fafc', borderRadius: '8px', borderLeft: '6px solid #1a202c' }}>
-                            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#718096', textTransform: 'uppercase', marginBottom: '10px' }}>To (Receiver)</h3>
-                            <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1a202c', margin: 0 }}>{printData.client} <span style={{ fontSize: '1.1rem', fontWeight: 500 }}>貴下</span></p>
-
-                            {printData.clientInfo && (
-                                <div style={{ marginTop: '8px', fontSize: '0.9rem', color: '#4a5568', lineHeight: '1.4' }}>
-                                    {printData.clientInfo.address && <p style={{ margin: '2px 0' }}>{printData.clientInfo.address}</p>}
-                                    {printData.clientInfo.ceo && <p style={{ margin: '2px 0' }}>ATTN: {printData.clientInfo.ceo}</p>}
-                                    {printData.clientInfo.bizNo && <p style={{ margin: '2px 0' }}>Biz No: {printData.clientInfo.bizNo}</p>}
-                                </div>
-                            )}
-
-                            <p style={{ marginTop: '15px', fontSize: '1rem', color: '#1a202c', lineHeight: '1.6', fontWeight: 500 }}>
-                                {printData.docType === 'PROFORMA'
-                                    ? '당사 제품을 발주해 주셔서 대단히 감사합니다. 귀사의 발주 내용을 바탕으로 본 Proforma Invoice를 발행하오니, 명시된 조건과 품목을 확인해 주시기 바랍니다.'
-                                    : '귀사의 무궁한 발전을 기원하며, 아래와 같이 견적드립니다.'}
-                            </p>
-                        </div>
-                        <div style={{ width: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'right' }}>
-                            <p style={{ fontSize: '1rem', color: '#718096', marginBottom: '5px' }}>Total Amount</p>
-                            <p style={{ fontSize: '2.4rem', fontWeight: 900, color: '#0070f3', margin: 0 }}>
-                                {getCurrencySymbol(printData.currency)}{printData.totalAmount.toLocaleString()}
-                            </p>
-                            <p style={{ fontSize: '0.8rem', color: '#a0aec0' }}>(Including/Excluding VAT: See Below)</p>
-                        </div>
-                    </div>
-
-                    {/* Table Section */}
-                    <table className="pi-table" style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '40px' }}>
+                    {/* Table */}
+                    <table className="quote-table">
                         <thead>
-                            <tr style={{ height: '40px' }}>
-                                <th style={{ width: '40px' }}>NO</th>
-                                <th>DESCRIPTION / SPECIFICATION</th>
-                                <th style={{ width: '160px' }}>TECHNICAL DETAIL</th>
-                                <th style={{ width: '60px' }}>UNIT</th>
-                                <th style={{ width: '60px' }}>QTY</th>
-                                <th style={{ width: '110px' }}>UNIT PRICE</th>
-                                <th style={{ width: '130px' }}>AMOUNT</th>
-                                <th style={{ width: '120px' }}>REMARKS</th>
+                            <tr>
+                                <th style={{ width: '5%' }}>No</th>
+                                <th style={{ textAlign: 'left', paddingLeft: '10px' }}>Description / Specifications</th>
+                                <th style={{ width: '15%' }}>Tech Detail</th>
+                                <th style={{ width: '8%' }}>Unit</th>
+                                <th style={{ width: '8%' }}>Qty</th>
+                                <th style={{ width: '12%', textAlign: 'right' }}>Unit Price</th>
+                                <th style={{ width: '15%', textAlign: 'right' }}>Amount</th>
+                                <th style={{ width: '15%' }}>Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
                             {printData.items.map((it, i) => (
-                                <tr key={i} style={{ height: '45px' }}>
-                                    <td style={{ textAlign: 'center', color: '#718096' }}>{i + 1}</td>
-                                    <td style={{ padding: '8px 12px' }}>
-                                        <p style={{ fontWeight: 700, fontSize: '12px', marginBottom: '2px', color: '#1a202c' }}>{it.product}</p>
-                                        <p style={{ fontSize: '10px', color: '#718096', margin: 0 }}>{it.description}</p>
+                                <tr key={i}>
+                                    <td style={{ textAlign: 'center', color: '#888' }}>{i + 1}</td>
+                                    <td style={{ paddingLeft: '10px' }}>
+                                        <div style={{ fontWeight: 600, color: '#171717' }}>{it.product}</div>
+                                        <div style={{ fontSize: '10px', color: '#888', marginTop: '2px' }}>{it.description}</div>
                                     </td>
-                                    <td style={{ textAlign: 'center', color: '#4a5568', lineHeight: '1.4' }}>
-                                        {it.voltage} / {it.watts}<br />
-                                        {it.luminousEff} / {it.cct}
+                                    <td style={{ textAlign: 'center', fontSize: '10px', color: '#666' }}>
+                                        {it.voltage}/{it.watts}<br />
+                                        {it.luminousEff}/{it.cct}
                                     </td>
                                     <td style={{ textAlign: 'center' }}>{it.unit}</td>
-                                    <td style={{ textAlign: 'center' }}>{it.qty}</td>
-                                    <td style={{ textAlign: 'right', paddingRight: '10px' }}>{it.unitPrice.toLocaleString()}</td>
-                                    <td style={{ textAlign: 'right', paddingRight: '10px', fontWeight: 700, color: '#1a202c' }}>{it.amount.toLocaleString()}</td>
-                                    <td style={{ padding: '8px', color: '#718096', fontSize: '10px' }}>{it.remarks}</td>
+                                    <td style={{ textAlign: 'center', fontWeight: 600 }}>{it.qty}</td>
+                                    <td style={{ textAlign: 'right' }}>{it.unitPrice.toLocaleString()}</td>
+                                    <td style={{ textAlign: 'right', fontWeight: 700, color: '#171717' }}>{it.amount.toLocaleString()}</td>
+                                    <td style={{ textAlign: 'center', fontSize: '10px', color: '#888' }}>{it.remarks}</td>
                                 </tr>
                             ))}
-                            <tr className="pi-total-row" style={{ height: '50px' }}>
-                                <td colSpan={6} style={{ textAlign: 'right', paddingRight: '15px', fontWeight: 800, fontSize: '13px', borderRight: 'none' }}>TOTAL AMOUNT ({printData.currency})</td>
-                                <td style={{ textAlign: 'right', paddingRight: '10px', fontWeight: 900, fontSize: '15px', color: '#0070f3', borderLeft: 'none' }}>
-                                    {getCurrencySymbol(printData.currency)}{printData.totalAmount.toLocaleString()}
-                                </td>
-                                <td></td>
-                            </tr>
+                            {/* Fill empty rows */}
+                            {Array.from({ length: Math.max(0, 8 - printData.items.length) }).map((_, i) => (
+                                <tr key={`empty-${i}`}>
+                                    <td style={{ padding: '15px' }}></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
 
-                    {/* Bottom Section */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '30px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '20px', minHeight: '120px' }}>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 10px 0', color: '#2d3748' }}>SPECIAL NOTES & TERMS</h4>
-                                <div style={{ fontSize: '0.85rem', color: '#4a5568', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-                                    {printData.specialNotes || '1. Delivery: To be discussed after P.O\n2. Payment: Cash/Transfer\n3. Validity: 1 Month from the above date\n4. Tax: VAT 10% separate unless specified'}
-                                </div>
-                            </div>
-                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '20px' }}>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 800, margin: '0 0 10px 0', color: '#2d3748' }}>BANK INFORMATION</h4>
-                                {printData.currency === 'KRW' ? (
-                                    <p style={{ fontSize: '0.9rem', color: '#1a202c', fontWeight: 600 }}>{company.bank}</p>
-                                ) : (
-                                    <div style={{ fontSize: '0.85rem', color: '#1a202c' }}>
-                                        <p style={{ margin: '0 0 4px 0', fontWeight: 600 }}>{company.bankForeign1}</p>
-                                        <p style={{ margin: 0 }}>{company.bankForeign2}</p>
-                                    </div>
-                                )}
+                    {/* Total Section */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#666' }}>GRAND TOTAL ({printData.currency})</div>
+                            <div style={{ fontSize: '24px', fontWeight: 900, color: '#171717' }}>
+                                {getCurrencySymbol(printData.currency)}{printData.totalAmount.toLocaleString()}
                             </div>
                         </div>
+                    </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '15px' }}>
-                                <p style={{ fontSize: '0.75rem', color: '#718096', marginBottom: '10px', fontWeight: 700 }}>PREPARED BY</p>
-                                <div style={{ height: '40px' }}></div>
-                            </div>
-                            <div style={{ border: '1px solid #1a202c', borderRadius: '8px', padding: '15px', background: '#f8fafc', position: 'relative', minHeight: '160px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                <p style={{ fontSize: '0.75rem', color: '#1a202c', marginBottom: '10px', fontWeight: 800 }}>AUTHORIZED APPROVAL</p>
-                                <div style={{ textAlign: 'right', width: '100%', zIndex: 2 }}>
-                                    <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700 }}>{company.name}</p>
-                                    <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.5 }}>(Sign or Seal)</p>
+                    {/* Terms and Bank Info */}
+                    <div style={{ display: 'flex', gap: '30px', marginTop: '40px' }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#171717', marginBottom: '10px', textTransform: 'uppercase' }}>Terms & Bank Info</div>
+                            <div style={{ fontSize: '12px', color: '#555', lineHeight: '1.6', borderTop: '1px solid #e5e5e5', paddingTop: '10px' }}>
+                                <div style={{ marginBottom: '10px', whiteSpace: 'pre-wrap' }}>{printData.specialNotes}</div>
+                                <div style={{ background: '#f5f5f5', padding: '10px', borderRadius: '4px' }}>
+                                    <div style={{ fontWeight: 700, marginBottom: '5px' }}>Bank Account</div>
+                                    {printData.currency === 'KRW' ? company.bank : `${company.bankForeign1}\n${company.bankForeign2}`}
                                 </div>
+                            </div>
+                        </div>
+                        <div style={{ width: '250px', display: 'flex', flexDirection: 'column', height: '150px' }}>
+                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#171717', marginBottom: '10px', textTransform: 'uppercase' }}>Authorized Signature</div>
+                            <div style={{ flex: 1, borderBottom: '2px solid #171717', position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
                                 {company.stampUrl && (
-                                    <img
-                                        src={company.stampUrl}
-                                        style={{
-                                            position: 'absolute',
-                                            right: '10%',
-                                            bottom: '5px',
-                                            width: '320px',
-                                            height: 'auto',
-                                            opacity: 0.65,
-                                            transform: 'rotate(-2deg)',
-                                            zIndex: 1,
-                                            pointerEvents: 'none'
-                                        }}
-                                    />
+                                    <img src={company.stampUrl} alt="Stamp" style={{ width: '100px', opacity: 0.8, transform: 'rotate(-5deg)', marginBottom: '10px' }} />
                                 )}
                             </div>
+                            <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 700, marginTop: '8px', color: '#171717' }}>{company.name}</div>
                         </div>
                     </div>
                 </div>
 
-                <div className="no-print" style={{ position: 'fixed', bottom: '30px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '15px', zIndex: 100 }}>
-                    <button onClick={() => setView('list')} style={{ background: '#4a5568', color: 'white', padding: '12px 25px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
-                        <ArrowLeft size={18} /> Exit Print Mode
-                    </button>
-                    <button onClick={() => {
-                        const originalTitle = document.title;
-                        document.title = `${printData.date || new Date().toISOString().split('T')[0]}_견적서_${printData.no}`;
-                        window.print();
-                        document.title = originalTitle;
-                    }} style={{ background: 'var(--accent-gradient)', color: 'white', padding: '12px 35px', borderRadius: '30px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, boxShadow: '0 4px 15px rgba(0,112,243,0.3)' }}>
-                        <Printer size={18} /> Print Document
-                    </button>
-                </div>
-
-                {/* Appendix Page for Attachments */}
-                {
-                    (printData.attach1 || printData.attach2 || printData.attach3 || printData.attacht1 || printData.attacht2 || printData.attacht3) && (
-                        <div className="appendix-page">
-                            <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#1a202c', borderBottom: '4px solid #1a202c', paddingBottom: '12px', marginBottom: '40px', letterSpacing: '2px', textAlign: 'center' }}>ATTACHMENTS & SPECIFICATIONS</h2>
-
+                {/* Attachments Page (if needed) */}
+                {(printData.attach1 || printData.attach2 || printData.attach3 || printData.attacht1 || printData.attacht2 || printData.attacht3) && (
+                    <div style={{ pageBreakBefore: 'always', marginTop: '50px', padding: '40px' }}>
+                        <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px', borderBottom: '2px solid #171717', paddingBottom: '10px' }}>ATTACHMENTS</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
                             {[1, 2, 3].map(n => {
                                 const img = (printData as any)[`attach${n}`];
                                 const text = (printData as any)[`attacht${n}`];
                                 if (!img && !text) return null;
                                 return (
                                     <div key={n} className="attach-item">
-                                        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '15px', color: '#1a202c', borderLeft: '5px solid #0070f3', paddingLeft: '12px' }}>
-                                            ATTACHMENT REF #{n}
-                                        </h3>
-                                        {img && <img src={img} className="attach-img" alt={`Attachment ${n}`} />}
-                                        {text && (
-                                            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '1rem', lineHeight: '1.8', color: '#2d3748', whiteSpace: 'pre-wrap' }}>
-                                                {text}
-                                            </div>
-                                        )}
+                                        <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '5px', color: '#888' }}>Attachment {n}</div>
+                                        {img && <img src={img} style={{ maxWidth: '100%', border: '1px solid #e5e5e5', borderRadius: '4px', marginBottom: '10px' }} />}
+                                        {text && <div style={{ fontSize: '12px', lineHeight: '1.6', color: '#333', whiteSpace: 'pre-wrap' }}>{text}</div>}
                                     </div>
                                 );
                             })}
                         </div>
-                    )
-                }
-            </div >
+                    </div>
+                )}
+
+                <div className="no-print" style={{ position: 'fixed', bottom: '30px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '15px', background: 'rgba(255,255,255,0.9)', padding: '10px 20px', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.2)', border: '1px solid rgba(0,0,0,0.1)' }}>
+                    <button onClick={() => setView('list')} style={{ background: 'transparent', color: '#171717', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
+                        <ArrowLeft size={16} /> Exit
+                    </button>
+                    <div style={{ width: '1px', height: '20px', background: '#e5e5e5' }}></div>
+                    <button onClick={() => window.print()} style={{ background: '#171717', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, padding: '8px 20px', borderRadius: '20px' }}>
+                        <Printer size={16} /> Print Quote
+                    </button>
+                </div>
+            </div>
         );
     }
 
@@ -596,7 +525,10 @@ export default function QuotesPage() {
                 {view === 'list' && (
                     <div style={{ display: 'flex', gap: '12px' }}>
                         <button onClick={() => {
-                            const newNo = 'Q' + new Date().toISOString().substring(0, 10).replace(/-/g, '') + '-' + Math.floor(Date.now() / 1000).toString().slice(-4);
+                            const now = new Date();
+                            const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+                            const timeStr = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0') + String(now.getSeconds()).padStart(2, '0');
+                            const newNo = 'Q' + dateStr + '-' + timeStr;
                             setForm({
                                 no: newNo,
                                 date: new Date().toISOString().substring(0, 10),
@@ -625,7 +557,10 @@ export default function QuotesPage() {
                             <Plus size={20} /> Create New Quote
                         </button>
                         <button onClick={() => {
-                            const newNo = 'PI' + new Date().toISOString().substring(0, 10).replace(/-/g, '') + '-' + Math.floor(Date.now() / 1000).toString().slice(-4);
+                            const now = new Date();
+                            const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+                            const timeStr = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0') + String(now.getSeconds()).padStart(2, '0');
+                            const newNo = 'PI' + dateStr + '-' + timeStr;
                             setForm({
                                 no: newNo,
                                 date: new Date().toISOString().substring(0, 10),
