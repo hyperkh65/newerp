@@ -64,6 +64,7 @@ const getCurrencySymbol = (cur: string) => {
 export default function PurchaseOrdersPage() {
     const [pos, setPos] = useState<PORecord[]>([]);
     const [suppliers, setSuppliers] = useState<any[]>([]);
+    const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState<'list' | 'create' | 'print'>('list');
     const [search, setSearch] = useState('');
@@ -174,6 +175,9 @@ export default function PurchaseOrdersPage() {
 
             setPos(Object.values(groupedPOs));
             setSuppliers(sRes.results);
+            // Fetch products for bulk price application
+            const pRes = await notionQuery(DB_PRODUCTS);
+            setProducts(pRes.results);
         } catch (e) {
             console.error('발주 데이터 로드 실패:', e);
         } finally {
@@ -343,6 +347,33 @@ export default function PurchaseOrdersPage() {
         setView('create'); // 불러오기 성공 시 작성 화면으로 전환
         alert(`${quote.no} 견적 내용이 불러와졌습니다. (가격은 0으로 설정되었습니다)`);
     };
+    const applyCostPrices = () => {
+        if (!products || products.length === 0) {
+            alert('제품 데이터를 불러오는 중이거나 데이터가 없습니다.');
+            return;
+        }
+
+        const updatedItems = form.items.map(item => {
+            if (!item.product) return item;
+            const matchedProduct = products.find(p => {
+                const pName = p.properties.Name?.title?.[0]?.plain_text || p.properties.Product?.title?.[0]?.plain_text || p.properties.ProductName?.title?.[0]?.plain_text;
+                return pName === item.product;
+            });
+
+            if (matchedProduct) {
+                // CostPrice (원가) 우선, 없으면 SupplyPrice 등 대체
+                const cost = matchedProduct.properties.CostPrice?.number || matchedProduct.properties.SupplyPrice?.number || matchedProduct.properties.Price?.number || 0;
+                if (cost > 0) {
+                    return { ...item, unitPrice: cost, amount: cost * item.qty };
+                }
+            }
+            return item;
+        });
+
+        setForm(prev => ({ ...prev, items: updatedItems }));
+        alert('등록된 원가가 일괄 적용되었습니다.');
+    };
+
     const handlePrint = (p: PORecord) => {
         // 공급업체 정보 매핑
         const supDoc = suppliers.find(s => {
@@ -594,6 +625,29 @@ export default function PurchaseOrdersPage() {
 
             {view === 'create' ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {/* Bulk Actions */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-10px' }}>
+                        <button
+                            onClick={applyCostPrices}
+                            style={{
+                                background: '#171717',
+                                border: '1px solid #333',
+                                padding: '10px 20px',
+                                borderRadius: '10px',
+                                color: 'white',
+                                fontWeight: 700,
+                                fontSize: '0.85rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                            }}
+                        >
+                            <CheckCircle size={16} /> 등록된 원가 일괄 적용
+                        </button>
+                    </div>
+
                     {/* Customer PO Root Buffer Section */}
                     <div className="glass" style={{ padding: '1.5rem 2.5rem', border: '1px solid rgba(230,126,34,0.3)', background: 'rgba(230,126,34,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
