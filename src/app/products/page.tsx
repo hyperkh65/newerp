@@ -307,20 +307,48 @@ export default function ProductsPage() {
                         <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.5rem' }}>제품 관리</h2>
                         <p style={{ color: 'rgba(255, 255, 255, 0.5)' }}>노션 DB 연동 스펙 및 인증서 통합 관리</p>
                     </div>
-                    <button onClick={() => openModal()} style={{ background: 'var(--accent-gradient)', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Plus size={18} /> 제품 등록
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <div style={{ position: 'relative', width: '300px' }}>
+                            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)' }} />
+                            <input
+                                placeholder="제품명, 코드, 제조사, 사양 검색..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                style={{ width: '100%', padding: '0.75rem 0.75rem 0.75rem 2.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', fontSize: '0.9rem' }}
+                            />
+                        </div>
+                        <button onClick={() => openModal()} style={{ background: 'var(--accent-gradient)', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Plus size={18} /> 제품 등록
+                        </button>
+                    </div>
                 </header>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                     {loading ? (
                         <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '5rem', opacity: 0.5 }}>로딩 중...</div>
-                    ) : products.filter(p => (
-                        p.properties.ProductName?.rich_text?.[0]?.plain_text || 
-                        p.properties.ProductCode?.rich_text?.[0]?.plain_text || 
-                        p.properties.이름?.title?.[0]?.plain_text || 
-                        ''
-                    ).toLowerCase().includes(search.toLowerCase())).map(p => {
+                    ) : products.filter(p => {
+                        const props = p.properties;
+                        const name = (props.ProductName?.rich_text?.[0]?.plain_text || props.이름?.title?.[0]?.plain_text || '').toLowerCase();
+                        const code = (props.ProductCode?.rich_text?.[0]?.plain_text || '').toLowerCase();
+                        const category = (props.ProductCategory?.rich_text?.[0]?.plain_text || '').toLowerCase();
+                        const maker = (props.Maker?.rich_text?.[0]?.plain_text || '').toLowerCase();
+                        const converter = (props.Converter?.rich_text?.[0]?.plain_text || '').toLowerCase();
+                        const s = search.toLowerCase();
+
+                        return name.includes(s) || code.includes(s) || category.includes(s) || maker.includes(s) || converter.includes(s);
+                    }).sort((a, b) => {
+                        const propsA = a.properties;
+                        const propsB = b.properties;
+                        const nameA = (propsA.ProductName?.rich_text?.[0]?.plain_text || propsA.이름?.title?.[0]?.plain_text || '').toLowerCase();
+                        const nameB = (propsB.ProductName?.rich_text?.[0]?.plain_text || propsB.이름?.title?.[0]?.plain_text || '').toLowerCase();
+                        const s = search.toLowerCase();
+
+                        if (nameA === s && nameB !== s) return -1;
+                        if (nameB === s && nameA !== s) return 1;
+                        if (nameA.startsWith(s) && !nameB.startsWith(s)) return -1;
+                        if (nameB.startsWith(s) && !nameA.startsWith(s)) return 1;
+                        return 0;
+                    }).map(p => {
                         const props = p.properties;
                         const img = props.Image?.files?.[0]?.external?.url || props.Image?.files?.[0]?.file?.url;
                         return (
