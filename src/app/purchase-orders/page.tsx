@@ -349,29 +349,46 @@ export default function PurchaseOrdersPage() {
     };
     const applyCostPrices = () => {
         if (!products || products.length === 0) {
-            alert('제품 데이터를 불러오는 중이거나 데이터가 없습니다.');
+            alert('제품 데이터를 불러오는 중이거나 데이터가 없습니다. (데이터를 불러온 후 다시 시도해 주세요)');
             return;
         }
 
+        let matchCount = 0;
         const updatedItems = form.items.map(item => {
             if (!item.product) return item;
+
+            const trimmedItemProduct = item.product.trim().toLowerCase();
             const matchedProduct = products.find(p => {
-                const pName = p.properties.Name?.title?.[0]?.plain_text || p.properties.Product?.title?.[0]?.plain_text || p.properties.ProductName?.title?.[0]?.plain_text;
-                return pName === item.product;
+                const props = p.properties;
+                // ProductName이 Title일 수도 있고 RichText일 수도 있음 (기존 코드의 불일치 대응)
+                const pNameFromRT = props.ProductName?.rich_text?.[0]?.plain_text;
+                const pNameFromTitle = props.ProductName?.title?.[0]?.plain_text;
+                const pNameAlternative = props['이름']?.title?.[0]?.plain_text;
+                const pCode = props.ProductCode?.rich_text?.[0]?.plain_text;
+
+                const possibleNames = [pNameFromRT, pNameFromTitle, pNameAlternative, pCode]
+                    .filter(n => n != null)
+                    .map(n => n!.trim().toLowerCase());
+
+                return possibleNames.includes(trimmedItemProduct);
             });
 
             if (matchedProduct) {
-                // CostPrice (원가) 우선, 없으면 SupplyPrice 등 대체
-                const cost = matchedProduct.properties.CostPrice?.number || matchedProduct.properties.SupplyPrice?.number || matchedProduct.properties.Price?.number || 0;
+                const cost = matchedProduct.properties.Cost?.number || 0;
                 if (cost > 0) {
+                    matchCount++;
                     return { ...item, unitPrice: cost, amount: cost * item.qty };
                 }
             }
             return item;
         });
 
-        setForm(prev => ({ ...prev, items: updatedItems }));
-        alert('등록된 원가가 일괄 적용되었습니다.');
+        if (matchCount === 0) {
+            alert('일치하는 제품 정보나 등록된 단가를 찾을 수 없습니다.\n(제품 데이터베이스의 [제품명] 또는 [제품코드]와 정확히 일치해야 합니다)');
+        } else {
+            setForm(prev => ({ ...prev, items: updatedItems }));
+            alert(`${matchCount}개 항목의 등록 단가가 적용되었습니다.`);
+        }
     };
 
     const handlePrint = (p: PORecord) => {
