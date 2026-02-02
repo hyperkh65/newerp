@@ -96,7 +96,10 @@ export default function ProductPicker({ isOpen, onClose, onSelect }: ProductPick
 
     const filtered = products.filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.code.toLowerCase().includes(search.toLowerCase())
+        p.code.toLowerCase().includes(search.toLowerCase()) ||
+        p.category.toLowerCase().includes(search.toLowerCase()) ||
+        p.converter.toLowerCase().includes(search.toLowerCase()) ||
+        p.maker.toLowerCase().includes(search.toLowerCase())
     ).sort((a, b) => {
         const s = search.toLowerCase();
         const aName = a.name.toLowerCase();
