@@ -321,15 +321,15 @@ export default function SalesManagementPage() {
 
     if (view === 'print' && printData) {
         return (
-            <div id="print-area" style={{ padding: '40px', background: 'white', color: '#171717', minHeight: '100vh', fontFamily: '"Noto Sans KR", sans-serif', boxSizing: 'border-box' }}>
+            <div id="print-area" style={{ width: '210mm', minHeight: '297mm', margin: '0 auto', background: 'white', color: '#171717', fontFamily: '"Noto Sans KR", sans-serif', boxSizing: 'border-box', padding: '10mm', position: 'relative' }}>
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
                     @media print { 
                         body * { visibility: hidden !important; }
                         #print-area, #print-area * { visibility: visible !important; } 
-                        #print-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 20px !important; }
+                        #print-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 210mm !important; min-height: 297mm !important; margin: 0 !important; padding: 10mm !important; background: white !important; box-sizing: border-box !important; }
                         .no-print { display: none !important; }
-                        @page { size: auto; margin: 0mm; }
+                        @page { size: A4 portrait; margin: 0; }
                     }
                     .modern-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     .modern-table th { text-align: center; border-top: 2px solid #171717; border-bottom: 1px solid #171717; padding: 12px 4px; font-size: 13px; font-weight: 700; color: #171717; background: #f9f9f9; }
@@ -489,7 +489,7 @@ export default function SalesManagementPage() {
                         <div style={{ fontSize: '14px', fontWeight: 700, color: '#171717', marginBottom: '40px' }}>위 금액을 영수(청구)함</div>
                         <div style={{ fontSize: '16px', fontWeight: 900, color: '#171717', zIndex: 2, position: 'relative' }}>{company.name}</div>
                         {company.stampUrl && (
-                            <img src={company.stampUrl} alt="Stamp" style={{ position: 'absolute', right: '50%', bottom: '-15px', width: '100px', opacity: 0.8, transform: 'translateX(50%) rotate(-5deg)', zIndex: 1 }} />
+                            <img src={company.stampUrl} alt="Stamp" style={{ position: 'absolute', right: '50%', bottom: '-40px', width: '250px', opacity: 0.8, transform: 'translateX(50%) rotate(-5deg)', zIndex: 1 }} />
                         )}
                     </div>
                 </div>

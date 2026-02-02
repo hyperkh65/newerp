@@ -412,15 +412,15 @@ export default function PurchaseOrdersPage() {
 
     if (view === 'print' && printData) {
         return (
-            <div id="print-area" style={{ padding: '0', background: 'white', color: '#171717', minHeight: '100vh', fontFamily: '"Noto Sans KR", sans-serif', boxSizing: 'border-box' }}>
+            <div id="print-area" style={{ width: '210mm', minHeight: '297mm', margin: '0 auto', background: 'white', color: '#171717', fontFamily: '"Noto Sans KR", sans-serif', boxSizing: 'border-box', padding: '10mm', position: 'relative' }}>
                 <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
                     @media print { 
                         body * { visibility: hidden !important; }
                         #print-area, #print-area * { visibility: visible !important; } 
-                        #print-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 20px !important; z-index: 9999 !important; background: white !important; }
+                        #print-area { position: absolute !important; left: 0 !important; top: 0 !important; width: 210mm !important; min-height: 297mm !important; margin: 0 !important; padding: 10mm !important; z-index: 9999 !important; background: white !important; box-sizing: border-box !important; }
                         .no-print { display: none !important; }
-                        @page { size: auto; margin: 0mm; }
+                        @page { size: A4 portrait; margin: 0; }
                     }
                     .po-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     .po-table th { text-align: center; border-top: 2px solid #171717; border-bottom: 1px solid #171717; padding: 10px 4px; font-size: 11px; font-weight: 700; color: #171717; background: #f9f9f9; text-transform: uppercase; }
@@ -431,7 +431,7 @@ export default function PurchaseOrdersPage() {
                     .box-title { position: absolute; top: -10px; left: 15px; background: white; padding: 0 10px; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
                     .box-content { font-size: 13px; line-height: 1.6; color: #333; }
                 `}</style>
-                <div style={{ padding: '40px' }}>
+                <div>
                     {/* Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '50px' }}>
                         <div style={{ width: '30%' }}>
@@ -540,9 +540,9 @@ export default function PurchaseOrdersPage() {
                         </div>
                         <div style={{ width: '250px', display: 'flex', flexDirection: 'column', height: '150px' }}>
                             <div style={{ fontSize: '11px', fontWeight: 700, color: '#171717', marginBottom: '10px', textTransform: 'uppercase' }}>Authorized Signature</div>
-                            <div style={{ flex: 1, borderBottom: '2px solid #171717', position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                            <div style={{ flex: 1, borderBottom: '2px solid #171717', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {company.stampUrl && (
-                                    <img src={company.stampUrl} alt="Stamp" style={{ width: '100px', opacity: 0.8, transform: 'rotate(-5deg)', marginBottom: '10px' }} />
+                                    <img src={company.stampUrl} alt="Stamp" style={{ width: '250px', opacity: 0.8, transform: 'rotate(-5deg)', position: 'absolute' }} />
                                 )}
                             </div>
                             <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: 700, marginTop: '8px', color: '#171717' }}>{company.name}</div>
