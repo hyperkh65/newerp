@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Calculator, Plus, Search, FileText, Trash2, Printer,
     ChevronRight, User, Building, MapPin, Mail, Phone,
-    TrendingUp, ArrowLeft, Filter, Download, CheckCircle, Package, X, ShoppingCart
+    TrendingUp, ArrowLeft, Filter, Download, CheckCircle, Package, X, ShoppingCart, Edit
 } from 'lucide-react';
 import Modal from '@/components/Modal';
 import ProductPicker from '@/components/ProductPicker';
@@ -249,6 +249,21 @@ export default function SalesManagementPage() {
             setLoading(true);
             const { net, vat, total } = calculateTotals();
 
+            // Start Transaction
+            // 1. Check if this is an update (Code exists)
+            const existingSale = sales.find(s => s.code === form.code);
+            if (existingSale) {
+                if (!confirm('해당 관리번호(' + form.code + ')로 이미 등록된 매출이 있습니다.\n기존 내용을 삭제하고 현재 내용으로 덮어쓰시겠습니까?')) {
+                    setLoading(false);
+                    return;
+                }
+                // Delete old items
+                for (const oldItem of existingSale.items) {
+                    await notionDelete(oldItem.id as string);
+                }
+            }
+
+            // 2. Create New Items
             for (let i = 0; i < form.items.length; i++) {
                 const item = form.items[i];
                 await notionCreate(DB_SALES, {
@@ -746,6 +761,28 @@ export default function SalesManagementPage() {
                                             <td style={{ padding: '1rem' }}>
                                                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                                                     <button onClick={() => handlePrint(s)} title="명세서 인쇄" style={{ padding: '8px', background: 'rgba(0,112,243,0.1)', border: 'none', borderRadius: '8px', color: '#0070f3' }}><Printer size={16} /></button>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (!validatePeriod(s.date)) return;
+                                                            setForm({
+                                                                code: s.code,
+                                                                date: s.date,
+                                                                customer: s.customer,
+                                                                saleType: s.saleType,
+                                                                salesperson: s.salesperson,
+                                                                poNo: s.poNo,
+                                                                vatEnabled: true,
+                                                                items: s.items.map(i => ({
+                                                                    ...i,
+                                                                    id: Date.now() + Math.random() // New temp ID for form handling
+                                                                }))
+                                                            });
+                                                            setView('create');
+                                                        }}
+                                                        title="수정" style={{ padding: '8px', background: 'rgba(255,193,7,0.1)', border: 'none', borderRadius: '8px', color: '#ffc107' }}
+                                                    >
+                                                        <Edit size={16} />
+                                                    </button>
                                                     <button
                                                         onClick={async () => {
                                                             if (!validatePeriod(s.date)) return;

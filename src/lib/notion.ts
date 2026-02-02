@@ -61,7 +61,29 @@ async function api(path: string, body: any) {
 }
 
 /* --------- Exported Notion Ops --------- */
-export const notionQuery = (db: string, body: any = {}) => api('/query', { db, ...body });
+/* --------- Exported Notion Ops --------- */
+export const notionQuery = async (db: string, body: any = {}) => {
+    let results: any[] = [];
+    let hasMore = true;
+    let nextCursor = undefined;
+
+    while (hasMore) {
+        const payload: any = { db, ...body };
+        if (nextCursor) {
+            payload.start_cursor = nextCursor;
+        }
+
+        const res: any = await api('/query', payload);
+        if (res.results) {
+            results = [...results, ...res.results];
+        }
+
+        hasMore = res.has_more;
+        nextCursor = res.next_cursor;
+    }
+
+    return { results };
+};
 export const notionCreate = (db: string, properties: any) => api('/create', { db, properties });
 export const notionUpdate = (pageId: string, properties: any) => api('/update', { pageId, properties });
 export const notionDelete = (pageId: string) => api('/delete', { pageId });
