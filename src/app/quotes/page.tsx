@@ -528,7 +528,9 @@ export default function QuotesPage() {
                             const now = new Date();
                             const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
                             const timeStr = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0') + String(now.getSeconds()).padStart(2, '0');
-                            const newNo = 'Q' + dateStr + '-' + timeStr;
+                            const msStr = String(now.getMilliseconds()).padStart(3, '0');
+                            const randomStr = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                            const newNo = 'Q' + dateStr + '-' + timeStr + msStr + '-' + randomStr;
                             setForm({
                                 no: newNo,
                                 date: new Date().toISOString().substring(0, 10),
@@ -560,7 +562,9 @@ export default function QuotesPage() {
                             const now = new Date();
                             const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
                             const timeStr = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0') + String(now.getSeconds()).padStart(2, '0');
-                            const newNo = 'PI' + dateStr + '-' + timeStr;
+                            const msStr = String(now.getMilliseconds()).padStart(3, '0');
+                            const randomStr = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                            const newNo = 'PI' + dateStr + '-' + timeStr + msStr + '-' + randomStr;
                             setForm({
                                 no: newNo,
                                 date: new Date().toISOString().substring(0, 10),
