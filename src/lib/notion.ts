@@ -8,7 +8,7 @@ export const COMPANY_INFO = {
     tel: '031-8066-7440',
     fax: '031-8066-7441',
     email: 'contact@ynkglobal.com',
-    bank: '국민은행 123456-78-901234 (예금주: 주식회사 와이엔케이글로벌)',
+    bank: '국민은행 123456-78-901234 (예금주: 주식회사 와이엔케이글로벌)\n기업은행 000-000000-00-000 (예금주: 주식회사 와이엔케이글로벌)',
     bankForeign1: 'BANK: SHINHAN BANK / SWIFT CODE: SHBKKRSE',
     bankForeign2: 'ACCOUNT NO: 110-123-456789 / ACCOUNT NAME: YNK GLOBAL CO., LTD.',
     stampUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=STAMP',

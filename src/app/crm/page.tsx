@@ -455,7 +455,9 @@ export default function SalesManagementPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px', marginTop: '25px' }}>
                         <div style={{ padding: '15px', border: '1px solid #cbd5e1', borderRadius: '4px' }}>
                             <p style={{ fontSize: '0.85rem', marginBottom: '8px', color: '#64748b' }}>[입금계좌 안내]</p>
-                            <p style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e293b' }}>{company.bank}</p>
+                            {company.bank.split('\n').map((line, i) => (
+                                <p key={i} style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1e293b', margin: i === 0 ? '0' : '4px 0 0 0' }}>{line}</p>
+                            ))}
                         </div>
                         <div style={{ padding: '15px', border: '1px solid #cbd5e1', borderRadius: '4px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden', minHeight: '100px' }}>
                             <p style={{ fontSize: '1.2rem', fontWeight: 900, zIndex: 2 }}>위 금액을 정히 영수(청구)함.</p>
