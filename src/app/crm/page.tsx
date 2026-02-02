@@ -71,7 +71,7 @@ export default function SalesManagementPage() {
         poNo: '',
         vatEnabled: true,
         items: [{
-            id: Date.now(),
+            id: Date.now() + Math.random(),
             product: '',
             specification: '',
             qty: 1,
@@ -148,6 +148,22 @@ export default function SalesManagementPage() {
 
             setSales(Object.values(grouped));
             setClients(cRes.results);
+
+            // Generate next code based on existing data
+            const todayStr = new Date().toISOString().substring(0, 10).replace(/-/g, '');
+            const todayPrefix = 'S' + todayStr;
+            const existingCodes = Object.keys(grouped).filter(k => k.startsWith(todayPrefix));
+
+            let nextSeq = 1;
+            if (existingCodes.length > 0) {
+                const seqs = existingCodes.map(c => parseInt(c.split('-')[1] || '0'));
+                nextSeq = Math.max(...seqs) + 1;
+            }
+
+            setForm(prev => ({
+                ...prev,
+                code: `${todayPrefix}-${String(nextSeq).padStart(3, '0')}`
+            }));
         } catch (e) {
             console.error('초기 데이터 로드 실패:', e);
         } finally {
@@ -191,7 +207,7 @@ export default function SalesManagementPage() {
         setForm({
             ...form,
             items: [...form.items, {
-                id: Date.now(),
+                id: Date.now() + Math.random(),
                 product: '',
                 specification: '',
                 qty: 1,
@@ -254,14 +270,15 @@ export default function SalesManagementPage() {
             alert('매출 ' + form.items.length + '건이 등록되었습니다.');
             setView('list');
             fetchInitialData();
-            // 기본값 리셋
-            setForm({
-                ...form,
-                code: 'S' + new Date().toISOString().substring(0, 10).replace(/-/g, '') + '-00' + (sales.length + 2),
+            // Removed duplicate fetchInitialData call
+
+            // 기본값 리셋 (fetchInitialData에서 code가 업데이트되므로 여기서는 제외하거나 임시값 사용)
+            setForm(prev => ({
+                ...prev,
                 customer: '',
                 poNo: '',
-                items: [{ id: Date.now(), product: '', specification: '', qty: 1, unitPrice: 0, amount: 0 }]
-            });
+                items: [{ id: Date.now() + Math.random(), product: '', specification: '', qty: 1, unitPrice: 0, amount: 0 }]
+            }));
         } catch (e: any) {
             alert('저장 실패: ' + e.message);
         } finally {
@@ -491,7 +508,17 @@ export default function SalesManagementPage() {
                     {view === 'list' && (
                         <button
                             onClick={() => {
-                                const newCode = 'S' + new Date().toISOString().substring(0, 10).replace(/-/g, '') + '-' + Math.floor(Date.now() / 1000).toString().slice(-3);
+                                // Recalculate code just in case
+                                const todayStr = new Date().toISOString().substring(0, 10).replace(/-/g, '');
+                                const todayPrefix = 'S' + todayStr;
+                                const existingCodes = sales.map(s => s.code).filter(k => k.startsWith(todayPrefix));
+                                let nextSeq = 1;
+                                if (existingCodes.length > 0) {
+                                    const seqs = existingCodes.map(c => parseInt(c.split('-')[1] || '0'));
+                                    nextSeq = Math.max(...seqs) + 1;
+                                }
+                                const newCode = `${todayPrefix}-${String(nextSeq).padStart(3, '0')}`;
+
                                 setForm({
                                     code: newCode,
                                     date: new Date().toISOString().substring(0, 10),
@@ -500,7 +527,7 @@ export default function SalesManagementPage() {
                                     salesperson: '',
                                     poNo: '',
                                     vatEnabled: true,
-                                    items: [{ id: Date.now(), product: '', specification: '', qty: 1, unitPrice: 0, amount: 0 }]
+                                    items: [{ id: Date.now() + Math.random(), product: '', specification: '', qty: 1, unitPrice: 0, amount: 0 }]
                                 });
                                 setView('create');
                             }}

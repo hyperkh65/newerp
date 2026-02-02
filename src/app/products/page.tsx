@@ -315,7 +315,12 @@ export default function ProductsPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                     {loading ? (
                         <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '5rem', opacity: 0.5 }}>로딩 중...</div>
-                    ) : products.filter(p => (p.properties.ProductName?.rich_text?.[0]?.plain_text || p.properties.ProductCode?.rich_text?.[0]?.plain_text || '').includes(search)).map(p => {
+                    ) : products.filter(p => (
+                        p.properties.ProductName?.rich_text?.[0]?.plain_text || 
+                        p.properties.ProductCode?.rich_text?.[0]?.plain_text || 
+                        p.properties.이름?.title?.[0]?.plain_text || 
+                        ''
+                    ).toLowerCase().includes(search.toLowerCase())).map(p => {
                         const props = p.properties;
                         const img = props.Image?.files?.[0]?.external?.url || props.Image?.files?.[0]?.file?.url;
                         return (

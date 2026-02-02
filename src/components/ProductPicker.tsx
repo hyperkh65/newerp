@@ -67,7 +67,7 @@ export default function ProductPicker({ isOpen, onClose, onSelect }: ProductPick
                 return {
                     id: r.id,
                     code: p.ProductCode?.rich_text?.[0]?.plain_text || '-',
-                    name: p.ProductName?.rich_text?.[0]?.plain_text || '이름 없음',
+                    name: p.ProductName?.rich_text?.[0]?.plain_text || p.이름?.title?.[0]?.plain_text || '이름 없음',
                     category: p.Category?.rich_text?.[0]?.plain_text || '',
                     maker: p.Maker?.rich_text?.[0]?.plain_text || '',
                     supplier: p.Supplier?.rich_text?.[0]?.plain_text || '',
@@ -86,7 +86,6 @@ export default function ProductPicker({ isOpen, onClose, onSelect }: ProductPick
                     isInventory: p.InventoryTarget?.checkbox === true
                 };
             });
-            // 만약 'InventoryTarget' 필드가 Notion에 있다면 필터링 활성화
             setProducts(data);
         } catch (e) {
             console.error('제품 로드 실패:', e);
@@ -98,7 +97,23 @@ export default function ProductPicker({ isOpen, onClose, onSelect }: ProductPick
     const filtered = products.filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.code.toLowerCase().includes(search.toLowerCase())
-    );
+    ).sort((a, b) => {
+        const s = search.toLowerCase();
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+
+        // 1. Exact match priority
+        if (aName === s && bName !== s) return -1;
+        if (bName === s && aName !== s) return 1;
+
+        // 2. Starts with priority
+        const aStarts = aName.startsWith(s);
+        const bStarts = bName.startsWith(s);
+        if (aStarts && !bStarts) return -1;
+        if (bStarts && !aStarts) return 1;
+
+        return 0;
+    });
 
     return (
         <>
